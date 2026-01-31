@@ -1,0 +1,537 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": "1.0",
+  "description": "ShakeFizz アプリ データ設計（Firebase / Firestore 想定）",
+  "appName": "ShakeFizz",
+  "lastUpdated": "2025-01-31",
+  "designNotes": "ランキングは「Session を期間で絞って算出」する設計でよい。LeaderboardEntry / Season は必須ではなく、規模が大きくなったときの事前集計用（読み取りコスト・レスポンス改善）。詳細は DESIGN.md（同 docs/ 内）「ランキングを Session から期間で算出するか」を参照。",
+
+  "enums": {
+    "DrinkType": {
+      "description": "飲み物（缶）の種類。UIの飲み物選択グリッドと対応",
+      "values": [
+        { "id": "ultra_cola", "labelEn": "ULTRA COLA", "labelJa": "ウルトラコーラ", "lockedByDefault": false },
+        { "id": "lime_burst", "labelEn": "LIME BURST", "labelJa": "ライムバースト", "lockedByDefault": false },
+        { "id": "beast_fuel", "labelEn": "BEAST FUEL", "labelJa": "ビーストフューエル", "lockedByDefault": false },
+        { "id": "ginger_shock", "labelEn": "GINGER SHOCK", "labelJa": "ジンジャーショック", "lockedByDefault": true, "unlockCondition": "rank_s" }
+      ]
+    },
+    "Rank": {
+      "description": "1プレイの結果ランク（スコアに応じて算出）",
+      "values": ["S", "A", "B", "C"],
+      "scoreThresholds": {
+        "S": { "minMeters": 20, "description": "20m以上" },
+        "A": { "minMeters": 15, "maxMeters": 19.99 },
+        "B": { "minMeters": 10, "maxMeters": 14.99 },
+        "C": { "maxMeters": 9.99 }
+      }
+    },
+    "RoomStatus": {
+      "description": "グループ対戦ルームの状態",
+      "values": [
+        { "id": "waiting", "label": "参加者待ち" },
+        { "id": "in_progress", "label": "プレイ中（各自スコア送信待ち）" },
+        { "id": "completed", "label": "全員プレイ完了・結果確定" },
+        { "id": "expired", "label": "タイムアウトまたは解散" }
+      ]
+    },
+    "UserTier": {
+      "description": "グローバルランキング表示用の称号（スコア・実績に応じて付与）",
+      "values": [
+        { "id": "rising_star", "labelEn": "RISING STAR" },
+        { "id": "elite", "labelEn": "ELITE" },
+        { "id": "expert", "labelEn": "EXPERT" },
+        { "id": "pro_shaker", "labelEn": "PRO SHAKER" }
+      ]
+    },
+    "RankingPeriod": {
+      "description": "ランキングの区切り単位。Session の timestamp でこの期間を指定してランキング算出",
+      "values": [
+        { "id": "weekly", "label": "ウィークリー（今週 月曜0:00〜日曜23:59）", "useCase": "今週のランキング・Weekly #1 バッジ" },
+        { "id": "monthly", "label": "月間シーズン（今月1日〜月末）", "useCase": "今月のランキング・SEASON ENDS IN 表示" }
+      ]
+    },
+    "BadgeType": {
+      "description": "ユーザーに付与する実績バッジ",
+      "values": [
+        { "id": "weekly_no1", "labelEn": "Weekly #1", "labelJa": "ウィークリー1位", "description": "その週のグローバル1位だった週ごとに付与" }
+      ]
+    }
+  },
+
+  "entities": {
+    "User": {
+      "description": "アプリ利用者。Firebase Auth の uid をキーに紐づく",
+      "firestorePath": "users/{uid}",
+      "fields": {
+        "uid": {
+          "type": "string",
+          "required": true,
+          "description": "Firebase Auth UID（ドキュメントIDと一致）"
+        },
+        "nickname": {
+          "type": "string",
+          "required": false,
+          "maxLength": 20,
+          "description": "表示名。未設定時は匿名IDを表示"
+        },
+        "anonymousId": {
+          "type": "string",
+          "required": false,
+          "description": "ニックネーム未設定時に表示する一時ID（例: Player#xxxx）"
+        },
+        "bestScore": {
+          "type": "number",
+          "required": false,
+          "description": "自己ベスト噴射高さ（m）"
+        },
+        "bestScoreDrinkType": {
+          "type": "string",
+          "required": false,
+          "ref": "enums.DrinkType",
+          "description": "自己ベストを出したときの飲み物"
+        },
+        "totalPlays": {
+          "type": "integer",
+          "required": false,
+          "default": 0,
+          "min": 0,
+          "description": "累計プレイ回数"
+        },
+        "userTier": {
+          "type": "string",
+          "required": false,
+          "ref": "enums.UserTier",
+          "description": "ランキング表示用称号"
+        },
+        "badges": {
+          "type": "array",
+          "itemsType": "BadgeRecord",
+          "required": false,
+          "description": "付与されたバッジ一覧。例: Weekly #1 の場合は { type: 'weekly_no1', weekId: '2025-W03' } を追加（weekId は ISO 週番号など）"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "required": false,
+          "description": "Cloud Storage のプロフィール画像URL。将来用"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "アカウント作成日時"
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "最終更新日時"
+        }
+      }
+    },
+
+    "Session": {
+      "description": "1回のプレイセッション（飲み物選択→安全警告→プレイ→結果）の記録",
+      "firestorePath": "sessions/{sessionId}",
+      "fields": {
+        "sessionId": {
+          "type": "string",
+          "required": true,
+          "description": "一意のセッションID（UUID または Firestore 自動ID）"
+        },
+        "uid": {
+          "type": "string",
+          "required": true,
+          "description": "プレイしたユーザーの UID"
+        },
+        "score": {
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "description": "達成した噴射高さ（m）"
+        },
+        "rank": {
+          "type": "string",
+          "required": true,
+          "ref": "enums.Rank",
+          "description": "このプレイのランク（S/A/B/C）"
+        },
+        "drinkType": {
+          "type": "string",
+          "required": true,
+          "ref": "enums.DrinkType",
+          "description": "選択した飲み物"
+        },
+        "topSpeed": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "プレイ中の最高速度（km/h）"
+        },
+        "totalShakes": {
+          "type": "integer",
+          "required": false,
+          "min": 0,
+          "description": "振った回数（または振り強度の積算値）"
+        },
+        "durationSeconds": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "プレイ時間（秒）。SESSION DURATION に対応"
+        },
+        "roomId": {
+          "type": "string",
+          "required": false,
+          "description": "グループ対戦に参加していた場合のルームID"
+        },
+        "isPersonalBest": {
+          "type": "boolean",
+          "required": false,
+          "description": "このプレイが自己ベスト更新か"
+        },
+        "timestamp": {
+          "type": "timestamp",
+          "required": true,
+          "description": "プレイ完了日時"
+        }
+      }
+    },
+
+    "Room": {
+      "description": "グループ対戦用ルーム。作成者（ホスト）が人数を指定し、参加者がコードで参加",
+      "firestorePath": "rooms/{roomId}",
+      "fields": {
+        "roomId": {
+          "type": "string",
+          "required": true,
+          "description": "一意のルームID（ドキュメントID）。検索用に roomCode も別途保持"
+        },
+        "roomCode": {
+          "type": "string",
+          "required": true,
+          "length": 6,
+          "description": "参加者に共有する4〜6桁のコード（大文字英数字）"
+        },
+        "hostUid": {
+          "type": "string",
+          "required": true,
+          "description": "ルーム作成者（ホスト）の UID"
+        },
+        "maxPlayers": {
+          "type": "integer",
+          "required": true,
+          "min": 2,
+          "max": 8,
+          "description": "最大参加人数"
+        },
+        "playerIds": {
+          "type": "array",
+          "items": "string",
+          "required": true,
+          "description": "参加中のユーザー UID の配列"
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "ref": "enums.RoomStatus",
+          "description": "waiting | in_progress | completed | expired"
+        },
+        "scores": {
+          "type": "array",
+          "itemsType": "RoomScore",
+          "required": false,
+          "description": "各プレイヤーのスコア（RoomScore の配列）。全員送信完了後に確定"
+        },
+        "expiresAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "ルームの有効期限（例: 作成から10分後）"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "ルーム作成日時"
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "最終更新日時"
+        }
+      }
+    },
+
+    "BadgeRecord": {
+      "description": "ユーザーに付与されたバッジ1件（User.badges の要素型）",
+      "embedded": true,
+      "fields": {
+        "type": { "type": "string", "required": true, "ref": "enums.BadgeType", "description": "バッジ種類（例: weekly_no1）" },
+        "weekId": { "type": "string", "required": false, "description": "付与週（例: 2025-W03 のようないそ週番号、または週開始日 YYYY-MM-DD）。Weekly #1 の場合はその週" }
+      }
+    },
+
+    "RoomScore": {
+      "description": "グループ対戦ルーム内の1プレイヤーのスコア（Room.scores の要素型）",
+      "embedded": true,
+      "fields": {
+        "uid": {
+          "type": "string",
+          "required": true,
+          "description": "プレイヤーの UID"
+        },
+        "nickname": {
+          "type": "string",
+          "required": false,
+          "description": "送信時点のニックネーム（表示用スナップショット）"
+        },
+        "score": {
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "description": "噴射高さ（m）"
+        },
+        "rank": {
+          "type": "string",
+          "required": true,
+          "ref": "enums.Rank",
+          "description": "このプレイのランク"
+        },
+        "drinkType": {
+          "type": "string",
+          "required": true,
+          "ref": "enums.DrinkType"
+        },
+        "submittedAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "スコア送信日時"
+        }
+      }
+    },
+
+    "LeaderboardEntry": {
+      "description": "（オプション）グローバルランキングの1エントリ。事前集計する場合に使用。小規模なら Session を期間で絞ってランキング算出すれば不要。規模が大きくなったときの読み取りコスト削減用。",
+      "optional": true,
+      "firestorePath": "leaderboards/{seasonId}/entries/{entryId}",
+      "fields": {
+        "seasonId": {
+          "type": "string",
+          "required": true,
+          "description": "シーズンID（例: 2025-01、月単位）"
+        },
+        "rank": {
+          "type": "integer",
+          "required": true,
+          "min": 1,
+          "description": "順位（1位〜）"
+        },
+        "uid": {
+          "type": "string",
+          "required": true,
+          "description": "ユーザー UID"
+        },
+        "nickname": {
+          "type": "string",
+          "required": false,
+          "description": "表示用ニックネーム（スナップショット）"
+        },
+        "score": {
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "description": "そのシーズンのベストスコア（m）"
+        },
+        "userTier": {
+          "type": "string",
+          "required": false,
+          "ref": "enums.UserTier",
+          "description": "表示用称号"
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "ランキング確定日時"
+        }
+      }
+    },
+
+    "Season": {
+      "description": "（オプション）ランキングシーズン（月替わり等）。SEASON ENDS IN の表示は「今月の末日」をコードで計算すれば持たなくてもよい。運用で期間を変えたいとき（例: 2週間イベント）に保持する。",
+      "optional": true,
+      "firestorePath": "seasons/{seasonId}",
+      "fields": {
+        "seasonId": {
+          "type": "string",
+          "required": true,
+          "description": "シーズンID（例: 2025-01）"
+        },
+        "startsAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "シーズン開始日時"
+        },
+        "endsAt": {
+          "type": "timestamp",
+          "required": true,
+          "description": "シーズン終了日時（SEASON ENDS IN の基準）"
+        },
+        "isActive": {
+          "type": "boolean",
+          "required": true,
+          "description": "現在進行中か"
+        }
+      }
+    },
+
+    "Drink": {
+      "description": "飲み物マスタ（缶の種類ごとのパラメータ）。アプリ内で固定または Firestore で管理",
+      "firestorePath": "drinks/{drinkTypeId}",
+      "fields": {
+        "drinkTypeId": {
+          "type": "string",
+          "required": true,
+          "ref": "enums.DrinkType",
+          "description": "飲み物ID"
+        },
+        "nameEn": {
+          "type": "string",
+          "required": true,
+          "description": "表示名（英語）"
+        },
+        "nameJa": {
+          "type": "string",
+          "required": false,
+          "description": "表示名（日本語）"
+        },
+        "fizzPercent": {
+          "type": "integer",
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "description": "FIZZ 値（UIのプログレスバー用、例: 85）"
+        },
+        "speedPercent": {
+          "type": "integer",
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "description": "SPEED 値（例: 92）"
+        },
+        "powerPercent": {
+          "type": "integer",
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "description": "POWER 値（例: 98）"
+        },
+        "isLocked": {
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "ロック状態（ランク等でアンロック）"
+        },
+        "unlockCondition": {
+          "type": "string",
+          "required": false,
+          "description": "アンロック条件（例: rank_s）"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "required": false,
+          "description": "選択グリッドの表示順"
+        }
+      }
+    },
+
+    "UserSettings": {
+      "description": "ユーザーごとのアプリ設定（音声・ハプティクス・言語等）",
+      "firestorePath": "users/{uid}/settings/settings",
+      "fields": {
+        "uid": {
+          "type": "string",
+          "required": true,
+          "description": "親ユーザー UID"
+        },
+        "languageCode": {
+          "type": "string",
+          "required": false,
+          "description": "言語コード（ja, en 等）"
+        },
+        "soundEnabled": {
+          "type": "boolean",
+          "required": false,
+          "default": true
+        },
+        "hapticsEnabled": {
+          "type": "boolean",
+          "required": false,
+          "default": true
+        },
+        "bgmEnabled": {
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "BGM（プレイ中）の ON/OFF"
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "required": true
+        }
+      }
+    }
+  },
+
+  "firestoreCollections": {
+    "users": {
+      "description": "ユーザープロフィール。ドキュメントID = uid",
+      "indexes": [
+        { "fields": ["bestScore", "desc"], "query": "ランキング用" },
+        { "fields": ["createdAt", "desc"], "query": "新規ユーザー一覧" }
+      ]
+    },
+    "sessions": {
+      "description": "プレイセッション履歴",
+      "indexes": [
+        { "fields": ["uid", "timestamp", "desc"], "query": "ユーザー別履歴" },
+        { "fields": ["roomId", "timestamp", "desc"], "query": "ルーム内スコア" },
+        { "fields": ["timestamp", "desc"], "query": "全セッション時系列" }
+      ]
+    },
+    "rooms": {
+      "description": "グループ対戦ルーム",
+      "indexes": [
+        { "fields": ["roomCode"], "query": "コードで参加検索（ユニーク）" },
+        { "fields": ["status", "expiresAt"], "query": "有効ルーム・期限切れ掃除" },
+        { "fields": ["hostUid", "createdAt", "desc"], "query": "ホストのルーム一覧" }
+      ]
+    },
+    "leaderboards": {
+      "description": "シーズン別グローバルランキング。サブコレクション entries",
+      "structure": "leaderboards/{seasonId}/entries/{entryId}",
+      "indexes": [
+        { "fields": ["seasonId", "rank"], "query": "シーズン内順位" },
+        { "fields": ["seasonId", "score", "desc"], "query": "トップN取得" }
+      ]
+    },
+    "seasons": {
+      "description": "ランキングシーズン定義",
+      "indexes": [
+        { "fields": ["isActive"], "query": "現在シーズン取得" }
+      ]
+    },
+    "drinks": {
+      "description": "飲み物マスタ（少ない件数ならクライアント固定でも可）",
+      "indexes": [
+        { "fields": ["sortOrder"], "query": "表示順" }
+      ]
+    }
+  },
+
+  "relationships": [
+    { "from": "User", "to": "Session", "type": "1:N", "key": "uid" },
+    { "from": "User", "to": "Room", "type": "N:M", "via": "Room.playerIds / Room.hostUid" },
+    { "from": "Room", "to": "Session", "type": "1:N", "key": "roomId" },
+    { "from": "Session", "to": "Room", "type": "N:1", "key": "roomId" },
+    { "from": "LeaderboardEntry", "to": "User", "type": "N:1", "key": "uid" },
+    { "from": "LeaderboardEntry", "to": "Season", "type": "N:1", "key": "seasonId" },
+    { "from": "UserSettings", "to": "User", "type": "1:1", "key": "uid (subcollection)" }
+  ]
+}
