@@ -1,0 +1,42 @@
+/* 
+  Localizable.strings
+  ShakeFizz
+*/
+
+// Drinks
+"ultra_cola" = "ULTRA COLA";
+"lime_burst" = "LIME BURST";
+"beast_fuel" = "BEAST FUEL";
+"ginger_shock" = "GINGER SHOCK";
+
+// Drink Selection
+"select_title" = "SELECT YOUR\nULTIMATE FIZZ";
+"fizz_label" = "FIZZ";
+"power_label" = "POWER";
+"start_shaking" = "START SHAKING";
+"can_placeholder" = "CAN";
+
+// Safety Warning
+"hold_tight" = "HOLD TIGHT WITH";
+"both_hands" = "BOTH HANDS!";
+"warning_desc" = "Extreme shaking ahead.\nDo not drop your phone!";
+"got_it" = "GOT IT!";
+
+// Play Screen
+"flavor_prefix" = "FLAVOR: %@";
+"unknown" = "UNKNOWN";
+"projected_spray" = "PROJECTED SPRAY";
+"max" = "MAX";
+"keep_shaking" = "KEEP SHAKING!";
+"pop_the_top" = "POP THE TOP";
+"time_remaining" = "REMAINING";
+"view_results" = "VIEW RESULTS";
+"time_up" = "TIME UP!";
+
+// Result Screen
+"mission_complete" = "MISSION COMPLETE";
+"rank_label" = "RANK";
+"meters_label" = "METERS";
+"try_again" = "TRY AGAIN";
+"change_drink" = "CHANGE DRINK";
+"no_data" = "No Result Data";

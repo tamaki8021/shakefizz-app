@@ -1,6 +1,6 @@
 # ShakeFizz iOS App
 
-This folder contains the native iOS source code for the ShakeFizz MVP.
+This folder contains the native iOS source code for the ShakeFizz MVP. The gameplay is currently a 15-second **Time Attack** mode.
 
 ## Requirements
 - macOS with Xcode 15+ installed.

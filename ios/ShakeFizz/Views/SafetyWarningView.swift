@@ -21,18 +21,18 @@ struct SafetyWarningView: View {
             .foregroundColor(.neonYellow)
 
           VStack(spacing: 10) {
-            Text("HOLD TIGHT WITH")
+            Text(LocalizedStringKey("hold_tight"))
               .font(.title2)
               .fontWeight(.bold)
               .foregroundColor(.white)
 
-            Text("BOTH HANDS!")
+            Text(LocalizedStringKey("both_hands"))
               .font(.system(size: 40, weight: .heavy))
               .foregroundColor(.neonYellow)
               .multilineTextAlignment(.center)
           }
 
-          Text("Extreme shaking ahead.\nDo not drop your phone!")
+          Text(LocalizedStringKey("warning_desc"))
             .font(.body)
             .foregroundColor(.gray)
             .multilineTextAlignment(.center)
@@ -40,7 +40,7 @@ struct SafetyWarningView: View {
 
         Spacer()
 
-        NeonButton(title: "GOT IT!", color: .neonCyan, icon: nil) {
+        NeonButton(title: NSLocalizedString("got_it", comment: ""), color: .neonCyan, icon: nil) {
           viewModel.acknowledgeWarning()
         }
         .padding()

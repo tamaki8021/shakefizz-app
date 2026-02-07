@@ -44,7 +44,6 @@ class ShakeManager: ObservableObject {
 
   private func processMotionData(_ data: CMDeviceMotion) {
     let userAccel = data.userAcceleration
-    let gravity = data.gravity
 
     // Calculate magnitude of user acceleration (removing gravity is handled by userAcceleration)
     let magnitude = sqrt(pow(userAccel.x, 2) + pow(userAccel.y, 2) + pow(userAccel.z, 2))
@@ -66,6 +65,14 @@ class ShakeManager: ObservableObject {
 
       // Calculate height directly from pressure
       // Simplistic formula: Height (m) = Pressure * Constant
+      self.projectedHeight = self.currentPressure * 0.5
+    }
+  }
+
+  func addPressure(amount: Double) {
+    DispatchQueue.main.async {
+      let gain = amount * self.fizzModifier
+      self.currentPressure = min(self.currentPressure + gain, self.maxPressure)
       self.projectedHeight = self.currentPressure * 0.5
     }
   }

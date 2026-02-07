@@ -1,0 +1,42 @@
+/* 
+  Localizable.strings
+  ShakeFizz
+*/
+
+// Drinks
+"ultra_cola" = "ウルトラコーラ";
+"lime_burst" = "ライムバースト";
+"beast_fuel" = "ビーストフューエル";
+"ginger_shock" = "ジンジャーショック";
+
+// Drink Selection
+"select_title" = "究極の炭酸を\n選べ";
+"fizz_label" = "炭酸度";
+"power_label" = "パワー";
+"start_shaking" = "シェイク開始";
+"can_placeholder" = "缶";
+
+// Safety Warning
+"hold_tight" = "両手でしっかり";
+"both_hands" = "持ってね！";
+"warning_desc" = "激しくシェイクします。\nスマホを落とさないで！";
+"got_it" = "わかった！";
+
+// Play Screen
+"flavor_prefix" = "フレーバー: %@";
+"unknown" = "不明";
+"projected_spray" = "予想噴射高";
+"max" = "最大";
+"keep_shaking" = "もっと振って！";
+"pop_the_top" = "開栓！";
+"time_remaining" = "残り時間";
+"view_results" = "結果を見る";
+"time_up" = "TIME UP!";
+
+// Result Screen
+"mission_complete" = "ミッション完了";
+"rank_label" = "ランク";
+"meters_label" = "メートル";
+"try_again" = "もう一度やる";
+"change_drink" = "ドリンクを変える";
+"no_data" = "データなし";
