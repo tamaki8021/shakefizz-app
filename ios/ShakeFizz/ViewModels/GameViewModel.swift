@@ -114,7 +114,7 @@ class GameViewModel: ObservableObject {
     // Check if this is a new personal best before updating
     let currentBest = UserDefaults.standard.double(forKey: "bestScore")
     let isPersonalBest = score > currentBest
-    
+
     let session = Session(
       score: score,
       rank: rank,
@@ -155,7 +155,10 @@ class GameViewModel: ObservableObject {
     guard !isCountingDown && !isTimeUp && gameState == .playing else { return }
 
     // Add pressure to shake manager (simulates a shake action)
-    shakeManager.addPressure(amount: 1.5)
+    // Balance adjustment: Tapping is less effective than shaking (50% efficiency)
+    let baseTapAmount = 1.5
+    let tapEfficiency = 0.5
+    shakeManager.addPressure(amount: baseTapAmount * tapEfficiency)
   }
 
   func resetGame() {
