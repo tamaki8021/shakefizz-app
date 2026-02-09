@@ -32,7 +32,7 @@ struct PlayScreenView: View {
         VStack(spacing: 0) {
           // Top Bar
           HStack {
-            Button(action: { 
+            Button(action: {
               showExitConfirmation = true
             }) {
               Image(systemName: "xmark")
@@ -44,11 +44,11 @@ struct PlayScreenView: View {
 
             Spacer()
 
-            VStack(spacing: 2) {
-              Text(viewModel.selectedDrink?.displayName.uppercased() ?? "UNKNOWN")
-                .font(.system(size: 14, weight: .black))
-                .foregroundColor(.white)
-            }
+            (Text(LocalizedStringKey("flavor_prefix"))
+              + Text(viewModel.selectedDrink?.displayName ?? "UNKNOWN"))
+              .font(.system(size: 14, weight: .black))
+              .foregroundColor(.white)
+              .textCase(.uppercase)
 
             Spacer()
           }
@@ -66,7 +66,7 @@ struct PlayScreenView: View {
                   Circle()
                     .stroke(Color.gray.opacity(0.3), lineWidth: 4)
                     .frame(width: 60, height: 60)
-                  
+
                   Circle()
                     .trim(from: 0, to: CGFloat(viewModel.gameTimeRemaining / 15.0))
                     .stroke(
@@ -76,7 +76,7 @@ struct PlayScreenView: View {
                     .frame(width: 60, height: 60)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.1), value: viewModel.gameTimeRemaining)
-                  
+
                   Text(
                     String(
                       format: "%02d:%02d",
@@ -98,10 +98,10 @@ struct PlayScreenView: View {
                 viewModel.performTapAction()
               }) {
                 HStack {
-                  Text("TAP TO BUILD PRESSURE")
+                  Text(LocalizedStringKey("tap_to_build"))
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
-                  
+
                   Image(systemName: "hand.tap.fill")
                     .foregroundColor(.white)
                 }
@@ -126,15 +126,18 @@ struct PlayScreenView: View {
         if viewModel.isTimeUp {
           ZStack {
             Color.black.opacity(0.6).ignoresSafeArea()
-            Text("TIME UP!")
+            Text(LocalizedStringKey("time_up"))
               .font(.system(size: 72, weight: .black))
               .foregroundColor(.white)
               .italic()
-              .shadow(color: .neonMagenta, radius: 20)
+              .shadow(color: .neonCyan, radius: 20)
 
             VStack {
               Spacer()
-              NeonButton(title: "VIEW RESULTS", color: .neonMagenta, icon: "arrow.right") {
+              NeonButton(
+                title: NSLocalizedString("view_results", comment: ""), color: .neonCyan,
+                icon: "arrow.right"
+              ) {
                 viewModel.finishTyringToPop()
               }
               .padding(.horizontal)
@@ -148,19 +151,19 @@ struct PlayScreenView: View {
         if viewModel.isCountingDown {
           ZStack {
             Color.black.opacity(0.8).ignoresSafeArea()
-            
+
             if viewModel.countdownValue > 0 {
               Text("\(viewModel.countdownValue)")
                 .font(.system(size: 144, weight: .black, design: .monospaced))
                 .foregroundColor(.white)
-                .shadow(color: .neonMagenta, radius: 20)
+                .shadow(color: .neonCyan, radius: 20)
                 .id(viewModel.countdownValue)
                 .transition(.scale.combined(with: .opacity))
             } else {
-              Text("GO!")
+              Text(LocalizedStringKey("go"))
                 .font(.system(size: 144, weight: .black, design: .monospaced))
                 .foregroundColor(.white)
-                .shadow(color: .neonMagenta, radius: 20)
+                .shadow(color: .neonCyan, radius: 20)
                 .transition(.scale.combined(with: .opacity))
             }
           }
@@ -175,15 +178,15 @@ struct PlayScreenView: View {
       .onDisappear {
         particleSystem.stop()
       }
-      .alert("プレイを中断しますか？", isPresented: $showExitConfirmation) {
-        Button("続行", role: .cancel) {
+      .alert(NSLocalizedString("alert_title", comment: ""), isPresented: $showExitConfirmation) {
+        Button(LocalizedStringKey("alert_continue"), role: .cancel) {
           showExitConfirmation = false
         }
-        Button("中断", role: .destructive) {
+        Button(LocalizedStringKey("alert_cancel"), role: .destructive) {
           viewModel.resetGame()
         }
       } message: {
-        Text("スコアは記録されません")
+        Text(LocalizedStringKey("alert_message"))
       }
       .onChange(of: viewModel.gameTimeRemaining) { newValue in
         // 残り3秒でハプティクスと視覚的フィードバック
@@ -194,7 +197,7 @@ struct PlayScreenView: View {
       }
     }
   }
-  
+
   // タイマーの色を残り時間に応じて変更
   private func timerColor(for remaining: Double) -> Color {
     if remaining <= 3.0 {

@@ -25,10 +25,10 @@ struct ResultView: View {
           Spacer()
 
           VStack(spacing: 2) {
-            Text("MISSION COMPLETE")
+            Text(LocalizedStringKey("mission_complete"))
               .font(.system(size: 10, weight: .bold))
               .foregroundColor(.neonCyan)
-            Text("SHAKEN!")
+            Text(LocalizedStringKey("shaken"))
               .font(.system(size: 14, weight: .black))
               .foregroundColor(.white)
           }
@@ -76,7 +76,7 @@ struct ResultView: View {
                         Text(String(format: "%.1f", session.score))
                           .font(.system(size: 80, weight: .black))
                           .foregroundColor(.white)
-                        Text("m")
+                        Text(LocalizedStringKey("meters_label"))
                           .font(.system(size: 24, weight: .black))
                           .foregroundColor(.neonCyan)
                       }
@@ -93,7 +93,7 @@ struct ResultView: View {
                   HStack(spacing: 8) {
                     Image(systemName: "star.fill")
                       .foregroundColor(.green)
-                    Text("NEW PERSONAL RECORD")
+                    Text(LocalizedStringKey("new_record"))
                       .font(.system(size: 12, weight: .bold))
                       .foregroundColor(.white)
                   }
@@ -105,11 +105,15 @@ struct ResultView: View {
                       .background(Color.neonCyan.opacity(0.1))
                   )
                   .cornerRadius(12)
-                  
+
                   if bestScore > 0 {
-                    Text("Best: \(String(format: "%.1f", bestScore))m")
-                      .font(.system(size: 10))
-                      .foregroundColor(.gray)
+                    Text(
+                      String(
+                        format: NSLocalizedString("best_format", comment: ""),
+                        String(format: "%.1f", bestScore))
+                    )
+                    .font(.system(size: 10))
+                    .foregroundColor(.gray)
                   }
                 }
                 .transition(.scale.combined(with: .opacity))
@@ -119,10 +123,12 @@ struct ResultView: View {
               if showTier3 && session.score > 0.0 {
                 HStack(spacing: 15) {
                   ResultStatCard(
-                    title: "TOP SPEED", value: "42", unit: "km/h", icon: "bolt.fill",
+                    title: NSLocalizedString("top_speed", comment: ""), value: "42",
+                    unit: NSLocalizedString("km_h", comment: ""), icon: "bolt.fill",
                     color: .neonCyan)
                   ResultStatCard(
-                    title: "TOTAL SHAKES", value: "\(session.totalShakes)", unit: "times",
+                    title: NSLocalizedString("total_shakes", comment: ""),
+                    value: "\(session.totalShakes)", unit: NSLocalizedString("times", comment: ""),
                     icon: "drop.fill", color: .neonCyan)
                 }
                 .padding(.horizontal)
@@ -132,7 +138,10 @@ struct ResultView: View {
               // Tier 3: Action Buttons
               if showTier3 {
                 VStack(spacing: 15) {
-                  NeonButton(title: "TRY AGAIN", color: .neonCyan, icon: "arrow.clockwise") {
+                  NeonButton(
+                    title: NSLocalizedString("try_again", comment: ""), color: .neonCyan,
+                    icon: "arrow.clockwise"
+                  ) {
                     viewModel.retryGame()
                   }
 
@@ -140,7 +149,7 @@ struct ResultView: View {
                     HStack {
                       Image(systemName: "bottle.fill")
                       Image(systemName: "wineglass.fill")
-                      Text("CHANGE DRINK")
+                      Text(LocalizedStringKey("change_drink"))
                         .font(.system(size: 16, weight: .black))
                     }
                     .foregroundColor(.white)
@@ -158,7 +167,7 @@ struct ResultView: View {
           }
         } else {
           Spacer()
-          Text("NO MISSION DATA")
+          Text(LocalizedStringKey("no_data"))
             .font(.headline)
             .foregroundColor(.gray)
           Spacer()
@@ -169,13 +178,13 @@ struct ResultView: View {
         withAnimation(.easeInOut(duration: 0.5)) {
           showTier1 = true
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
           withAnimation(.easeInOut(duration: 0.5)) {
             showTier2 = true
           }
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
           withAnimation(.easeInOut(duration: 0.5)) {
             showTier3 = true
@@ -223,7 +232,6 @@ struct ResultStatCard: View {
     )
   }
 }
-
 
 // Helper for Hex Color
 extension Color {

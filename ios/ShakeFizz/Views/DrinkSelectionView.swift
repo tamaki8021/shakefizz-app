@@ -3,6 +3,7 @@ import SwiftUI
 struct DrinkSelectionView: View {
   @ObservedObject var viewModel: GameViewModel
   @State private var showLockedModal: Bool = false
+  @State private var showSettings: Bool = false
   @State private var lockedDrinkType: DrinkType?
 
   let columns = [
@@ -17,6 +18,16 @@ struct DrinkSelectionView: View {
       VStack(spacing: 0) {
         // Top Navigation Bar
         HStack {
+          Button(action: {
+            showSettings = true
+          }) {
+            Image(systemName: "gearshape.fill")
+              .font(.title2)
+              .foregroundColor(.white)
+              .padding(8)
+              .background(Circle().fill(Color.white.opacity(0.1)))
+          }
+
           Spacer()
 
           Text("SHAKE FIZZ")
@@ -24,6 +35,10 @@ struct DrinkSelectionView: View {
             .foregroundColor(.neonCyan)
 
           Spacer()
+
+          // Spacer explicitly for balance
+          Spacer()
+            .frame(width: 44)
         }
         .padding(.horizontal)
         .padding(.top, 10)
@@ -32,26 +47,19 @@ struct DrinkSelectionView: View {
           VStack(alignment: .leading, spacing: 10) {
             // Header
             VStack(alignment: .leading, spacing: 4) {
-              Text("SELECT YOUR")
+              Text(LocalizedStringKey("select_title"))
                 .font(.system(size: 36, weight: .black))
-                .foregroundColor(.white)
-              Text("ULTIMATE FIZZ")
-                .font(.system(size: 36, weight: .black))
-                .foregroundColor(.neonCyan)
+                .foregroundColor(.white)  // "ULTIMATE FIZZ" part color needs logic if we want to keep it Cyan.
+              // Since "select_title" combines both, we might just color it all white or keep it simple.
+              // Let's stick to simple localization first.
 
-              Text("Choose your weapon. Higher carbonation means\nmore height, but less stability.")
+              Text(LocalizedStringKey("select_subtitle"))
                 .font(.system(size: 14))
                 .foregroundColor(.gray)
                 .padding(.top, 4)
             }
             .padding(.horizontal)
             .padding(.top, 20)
-
-            // Your Best Section
-            YourBestView()
-              .padding(.horizontal)
-              .padding(.top, 20)
-              .padding(.bottom, 10)
 
             // Grid
             LazyVGrid(columns: columns, spacing: 16) {
@@ -61,7 +69,7 @@ struct DrinkSelectionView: View {
                     // ハプティクスフィードバック
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
-                    
+
                     // ロック缶の場合はモーダルを表示
                     if drinkType.isLocked {
                       lockedDrinkType = drinkType
@@ -74,14 +82,15 @@ struct DrinkSelectionView: View {
             }
             .padding()
 
-            Spacer(minLength: 100)
+            Spacer(minLength: 120)  // Increased padding for button overlap
           }
         }
 
         // Floating Start Button Area
         VStack {
           PulsingNeonButton(
-            title: "SHAKE NOW!",
+            title: "shake_now",
+            localized: true,
             color: viewModel.selectedDrink != nil ? .neonCyan : .gray,
             icon: "bolt.fill"
           ) {
@@ -97,9 +106,12 @@ struct DrinkSelectionView: View {
           )
         }
       }
-      .sheet(isPresented: $showLockedModal) {
-        LockedDrinkModal(drinkType: lockedDrinkType)
-      }
+    }
+    .sheet(isPresented: $showLockedModal) {
+      LockedDrinkModal(drinkType: lockedDrinkType)
+    }
+    .sheet(isPresented: $showSettings) {
+      SettingsView()
     }
   }
 }
@@ -108,34 +120,34 @@ struct DrinkSelectionView: View {
 struct LockedDrinkModal: View {
   let drinkType: DrinkType?
   @Environment(\.dismiss) var dismiss
-  
+
   var body: some View {
     ZStack {
       Color.black.opacity(0.8)
         .ignoresSafeArea()
-      
+
       VStack(spacing: 24) {
         // 南京錠アイコン
         Image(systemName: "lock.fill")
           .font(.system(size: 60))
           .foregroundColor(.neonYellow)
-        
+
         // タイトル
-        Text("LOCKED")
+        Text(LocalizedStringKey("locked"))
           .font(.system(size: 32, weight: .black))
           .foregroundColor(.white)
-        
+
         // メッセージ
-        Text("Reach Rank S to unlock this drink")
+        Text(LocalizedStringKey("locked_desc"))
           .font(.system(size: 16))
           .foregroundColor(.gray)
           .multilineTextAlignment(.center)
-        
+
         // OKボタン
         Button(action: {
           dismiss()
         }) {
-          Text("OK")
+          Text(LocalizedStringKey("ok"))
             .font(.headline)
             .fontWeight(.bold)
             .foregroundColor(.black)
@@ -156,20 +168,39 @@ struct LockedDrinkModal: View {
 // 脈動アニメーション付きのNeonButton
 struct PulsingNeonButton: View {
   let title: String
+  let localized: Bool
   let color: Color
   let icon: String?
   let action: () -> Void
-  
+
   @State private var isPulsing = false
-  
+
+  init(
+    title: String, localized: Bool = false, color: Color, icon: String? = nil,
+    action: @escaping () -> Void
+  ) {
+    self.title = title
+    self.localized = localized
+    self.color = color
+    self.icon = icon
+    self.action = action
+  }
+
   var body: some View {
     Button(action: action) {
       HStack {
-        Text(title)
-          .font(.headline)
-          .fontWeight(.bold)
-          .foregroundColor(.black)
-        
+        if localized {
+          Text(LocalizedStringKey(title))
+            .font(.headline)
+            .fontWeight(.bold)
+            .foregroundColor(.black)
+        } else {
+          Text(title)
+            .font(.headline)
+            .fontWeight(.bold)
+            .foregroundColor(.black)
+        }
+
         if let icon = icon {
           Image(systemName: icon)
             .foregroundColor(.black)
@@ -187,45 +218,6 @@ struct PulsingNeonButton: View {
         isPulsing = true
       }
     }
-  }
-}
-
-struct YourBestView: View {
-  @AppStorage("bestScore") private var bestScore: Double = 0.0
-  @AppStorage("bestRank") private var bestRank: String = ""
-  @AppStorage("bestDrink") private var bestDrink: String = ""
-  @AppStorage("bestDate") private var bestDate: String = ""
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Text("YOUR BEST")
-        .font(.system(size: 12, weight: .black))
-        .foregroundColor(.neonCyan)
-
-      if bestScore > 0 {
-        HStack(alignment: .lastTextBaseline, spacing: 4) {
-          Text(String(format: "%.1f", bestScore))
-            .font(.system(size: 48, weight: .black))
-            .foregroundColor(.neonCyan)
-          Text("m")
-            .font(.system(size: 20, weight: .black))
-            .foregroundColor(.neonCyan.opacity(0.7))
-        }
-
-        Text("\(bestRank) · \(bestDrink) · \(bestDate)")
-          .font(.system(size: 12))
-          .foregroundColor(.gray)
-      } else {
-        Text("START YOUR FIRST GAME!")
-          .font(.system(size: 16, weight: .bold))
-          .foregroundColor(.gray)
-          .padding(.vertical, 8)
-      }
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.white.opacity(0.05))
-    .cornerRadius(16)
   }
 }
 
@@ -248,18 +240,18 @@ struct DrinkCard: View {
           )
 
         if isSelected {
-          Text("READY!")
+          Text(LocalizedStringKey("ready"))
             .font(.system(size: 10, weight: .black))
             .foregroundColor(.white)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Capsule().fill(Color.neonMagenta))
+            .background(Capsule().fill(Color.neonCyan))
             .padding(8)
         }
       }
 
       VStack(alignment: .leading, spacing: 4) {
-        Text(type.displayName.uppercased())
+        Text(type.displayName)
           .font(.system(size: 16, weight: .black))
           .foregroundColor(.white)
 
@@ -267,30 +259,30 @@ struct DrinkCard: View {
         VStack(alignment: .leading, spacing: 4) {
           // FIZZ label with percentage and icons in one line
           HStack(spacing: 4) {
-            Text("FIZZ")
+            Text(LocalizedStringKey("fizz_label"))
               .font(.system(size: 8, weight: .bold))
               .foregroundColor(.gray)
-            
+
             Text("\(type.fizzPercent)%")
               .font(.system(size: 8, weight: .bold))
               .foregroundColor(.gray)
-            
+
             // Icons for FIZZ meaning
             Image(systemName: "arrow.up")
               .font(.system(size: 8))
               .foregroundColor(.neonCyan)
-            
-            Text("高さ")
-              .font(.system(size: 7))
-              .foregroundColor(.gray.opacity(0.7))
-            
+
+            Text(LocalizedStringKey("height_label"))
+              .font(.system(size: 9))
+              .foregroundColor(.gray.opacity(0.9))
+
             Image(systemName: "exclamationmark.triangle.fill")
-              .font(.system(size: 8))
+              .font(.system(size: 10))
               .foregroundColor(.neonYellow)
-            
-            Text("不安定")
-              .font(.system(size: 7))
-              .foregroundColor(.gray.opacity(0.7))
+
+            Text(LocalizedStringKey("stability_label"))
+              .font(.system(size: 9))
+              .foregroundColor(.gray.opacity(0.9))
 
             Spacer()
           }
@@ -303,7 +295,7 @@ struct DrinkCard: View {
               .frame(height: 4)
 
             Capsule()
-              .fill(isSelected ? Color.neonCyan : Color.yellow)
+              .fill(fizzColor)
               .frame(width: geo.size.width * CGFloat(type.fizzPercent) / 100.0, height: 4)
           }
         }
@@ -315,7 +307,9 @@ struct DrinkCard: View {
     .cornerRadius(20)
     .overlay(
       RoundedRectangle(cornerRadius: 20)
-        .stroke(isSelected ? Color.neonCyan : Color.gray.opacity(0.2), lineWidth: isSelected ? 3 : 2)
+        .stroke(
+          isSelected ? Color.neonCyan : Color.gray.opacity(0.2), lineWidth: isSelected ? 3 : 2
+        )
         .animation(.easeInOut(duration: 0.2), value: isSelected)
     )
     .shadow(color: isSelected ? .neonCyan.opacity(0.3) : .clear, radius: 10)
@@ -327,12 +321,21 @@ struct DrinkCard: View {
             Image(systemName: "lock.fill")
               .font(.title2)
               .foregroundColor(.white)
-            Text("RANK 5")
+            Text(LocalizedStringKey("rank_5"))
               .font(.system(size: 10, weight: .bold))
               .foregroundColor(.white)
           }
         }
       }
     )
+  }
+
+  private var fizzColor: Color {
+    switch type {
+    case .ultraCola: return .neonCyan
+    case .limeBurst: return .neonYellow
+    case .beastFuel: return .neonMagenta
+    case .gingerShock: return .gray
+    }
   }
 }
