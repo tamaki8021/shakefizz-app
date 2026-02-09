@@ -9,12 +9,12 @@ enum DrinkType: String, Codable, CaseIterable, Identifiable {
 
   var id: String { rawValue }
 
-  var displayName: String {
+  var displayName: LocalizedStringKey {
     switch self {
-    case .ultraCola: return NSLocalizedString("ultra_cola", comment: "Drink Name")
-    case .limeBurst: return NSLocalizedString("lime_burst", comment: "Drink Name")
-    case .beastFuel: return NSLocalizedString("beast_fuel", comment: "Drink Name")
-    case .gingerShock: return NSLocalizedString("ginger_shock", comment: "Drink Name")
+    case .ultraCola: return LocalizedStringKey("ultra_cola")
+    case .limeBurst: return LocalizedStringKey("lime_burst")
+    case .beastFuel: return LocalizedStringKey("beast_fuel")
+    case .gingerShock: return LocalizedStringKey("ginger_shock")
     }
   }
 
@@ -31,26 +31,8 @@ enum DrinkType: String, Codable, CaseIterable, Identifiable {
     switch self {
     case .ultraCola: return 85
     case .limeBurst: return 70
-    case .beastFuel: return 60
+    case .beastFuel: return 95
     case .gingerShock: return 95
-    }
-  }
-
-  var speedPercent: Int {
-    switch self {
-    case .ultraCola: return 60
-    case .limeBurst: return 92
-    case .beastFuel: return 80
-    case .gingerShock: return 50
-    }
-  }
-
-  var powerPercent: Int {
-    switch self {
-    case .ultraCola: return 70
-    case .limeBurst: return 60
-    case .beastFuel: return 98
-    case .gingerShock: return 90
     }
   }
 
