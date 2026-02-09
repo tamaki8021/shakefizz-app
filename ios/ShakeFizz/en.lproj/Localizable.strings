@@ -40,3 +40,39 @@
 "try_again" = "TRY AGAIN";
 "change_drink" = "CHANGE DRINK";
 "no_data" = "No Result Data";
+
+// Settings
+"language" = "Language";
+"about" = "About";
+"version" = "Version";
+"build" = "Build";
+"settings" = "Settings";
+"done" = "Done";
+
+// Drink Selection Missing
+"select_subtitle" = "Choose your weapon. Higher carbonation means\nmore height, but less stability.";
+"shake_now" = "SHAKE NOW!";
+"locked" = "LOCKED";
+"locked_desc" = "Reach Rank S to unlock this drink";
+"ok" = "OK";
+"ready" = "READY!";
+"rank_5" = "RANK 5";
+"height_label" = "Height";
+"stability_label" = "Stability";
+
+// Play Screen Missing
+"tap_to_build" = "TAP TO BUILD PRESSURE";
+"alert_title" = "Quit Game?";
+"alert_message" = "Score will not be saved.";
+"alert_continue" = "Continue";
+"alert_cancel" = "Quit";
+"go" = "GO!";
+
+// Result Screen Missing
+"shaken" = "SHAKEN!";
+"try_harder" = "Shake Harder!";
+"new_record" = "NEW PERSONAL RECORD";
+"best_format" = "Best: %@m";
+"top_speed" = "TOP SPEED";
+"total_shakes" = "TOTAL SHAKES";
+"times" = "times";

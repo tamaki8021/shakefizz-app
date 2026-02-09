@@ -40,3 +40,39 @@
 "try_again" = "もう一度やる";
 "change_drink" = "ドリンクを変える";
 "no_data" = "データなし";
+
+// Settings
+"language" = "言語";
+"about" = "アプリについて";
+"version" = "バージョン";
+"build" = "ビルド";
+"settings" = "設定";
+"done" = "完了";
+
+// Drink Selection Missing
+"select_subtitle" = "武器を選べ。炭酸が強いほど高く飛ぶが、\nその分だけ不安定になる。";
+"shake_now" = "今すぐシェイク！";
+"locked" = "LOCKED";
+"locked_desc" = "ランクS到達でアンロック";
+"ok" = "OK";
+"ready" = "READY!";
+"rank_5" = "RANK 5";
+"height_label" = "高さ";
+"stability_label" = "不安定";
+
+// Play Screen Missing
+"tap_to_build" = "タップで圧力を溜める";
+"alert_title" = "プレイを中断しますか？";
+"alert_message" = "スコアは記録されません";
+"alert_continue" = "続行";
+"alert_cancel" = "中断";
+"go" = "GO!";
+
+// Result Screen Missing
+"shaken" = "SHAKEN!";
+"try_harder" = "もっと振ってみよう！";
+"new_record" = "自己ベスト更新";
+"best_format" = "ベスト: %@m";
+"top_speed" = "最高速度";
+"total_shakes" = "シェイク回数";
+"times" = "回";
