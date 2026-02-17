@@ -11,6 +11,7 @@
 
 // Drink Selection
 "select_title" = "究極の炭酸を\n選べ";
+"choose_flavor" = "味を選べ";
 "fizz_label" = "炭酸度";
 "power_label" = "パワー";
 "start_shaking" = "シェイク開始";
@@ -61,7 +62,7 @@
 "stability_label" = "不安定";
 
 // Play Screen Missing
-"tap_to_build" = "タップで圧力を溜める";
+"tap_to_build" = "タップ";
 "alert_title" = "プレイを中断しますか？";
 "alert_message" = "スコアは記録されません";
 "alert_continue" = "続行";
@@ -76,3 +77,43 @@
 "top_speed" = "最高速度";
 "total_shakes" = "シェイク回数";
 "times" = "回";
+
+// Settings Screen
+"edit_profile" = "プロフィール編集";
+"sound_effects" = "サウンド効果";
+"sound_effects_desc" = "爆発や破裂音を含む";
+"haptic_feedback" = "触覚フィードバック";
+"haptic_feedback_desc" = "アクション時の振動";
+"vibration_intensity" = "振動の強さ";
+"active_game_mode" = "アクティブなゲームモード";
+"mode_normal" = "ノーマル";
+"mode_normal_desc" = "クラシック";
+"mode_speed" = "スピード";
+"mode_speed_desc" = "速いペース";
+"mode_endless" = "エンドレス";
+"mode_endless_desc" = "無限プレイ";
+"about_shakefizz" = "ShakeFizzについて";
+"privacy_policy" = "プライバシーポリシー";
+"terms_of_service" = "利用規約";
+"logout" = "ログアウト";
+"unlock_msg" = "プレイして解除";
+"tactile_feedback" = "触覚フィードバック";
+
+// Settings Screen - Updated
+"music" = "音楽";
+"music_desc" = "ハイエネルギービート";
+"immersion" = "没入感";
+"accessibility" = "アクセシビリティ";
+"reduce_motion" = "モーション削減";
+"high_contrast" = "ハイコントラスト";
+"mode_time_atk" = "タイムアタック";
+"mode_time_atk_desc" = "速いペース";
+"mode_normal_long_desc" = "バランスの取れた炭酸物理の標準競技モード。";
+"mode_endless_long_desc" = "無限プレイ";
+"app_version" = "SHAKE FIZZ v%@";
+"support" = "サポート";
+"terms" = "利用規約";
+"privacy" = "プライバシー";
+"fizz_master" = "フィズマスター";
+"level_rank" = "レベル %d • ランク #%d";
+"game_mode" = "ゲームモード";

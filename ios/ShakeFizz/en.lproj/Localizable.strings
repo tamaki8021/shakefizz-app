@@ -11,6 +11,7 @@
 
 // Drink Selection
 "select_title" = "SELECT YOUR\nULTIMATE FIZZ";
+"choose_flavor" = "Pick Your Power";
 "fizz_label" = "FIZZ";
 "power_label" = "POWER";
 "start_shaking" = "START SHAKING";
@@ -61,7 +62,7 @@
 "stability_label" = "Stability";
 
 // Play Screen Missing
-"tap_to_build" = "TAP TO BUILD PRESSURE";
+"tap_to_build" = "TAP";
 "alert_title" = "Quit Game?";
 "alert_message" = "Score will not be saved.";
 "alert_continue" = "Continue";
@@ -76,3 +77,43 @@
 "top_speed" = "TOP SPEED";
 "total_shakes" = "TOTAL SHAKES";
 "times" = "times";
+
+// Settings Screen
+"edit_profile" = "EDIT PROFILE";
+"sound_effects" = "Sound Effects";
+"sound_effects_desc" = "Includes blasts and pops";
+"haptic_feedback" = "Haptic Feedback";
+"haptic_feedback_desc" = "Vibration on actions";
+"vibration_intensity" = "VIBRATION INTENSITY";
+"active_game_mode" = "ACTIVE GAME MODE";
+"mode_normal" = "NORMAL";
+"mode_normal_desc" = "CLASSIC";
+"mode_speed" = "SPEED";
+"mode_speed_desc" = "FAST PACED";
+"mode_endless" = "ENDLESS";
+"mode_endless_desc" = "INFINITE PLAY";
+"about_shakefizz" = "About ShakeFizz";
+"privacy_policy" = "Privacy Policy";
+"terms_of_service" = "Terms of Service";
+"logout" = "LOGOUT";
+"unlock_msg" = "Unlock by playing";
+"tactile_feedback" = "TACTILE FEEDBACK";
+
+// Settings Screen - Updated
+"music" = "Music";
+"music_desc" = "High energy beats";
+"immersion" = "IMMERSION";
+"accessibility" = "ACCESSIBILITY";
+"reduce_motion" = "Reduce Motion";
+"high_contrast" = "High Contrast";
+"mode_time_atk" = "TIME ATK";
+"mode_time_atk_desc" = "Fast paced";
+"mode_normal_long_desc" = "Standard competition mode with balanced fizz physics.";
+"mode_endless_long_desc" = "Infinite play";
+"app_version" = "SHAKE FIZZ v%@";
+"support" = "Support";
+"terms" = "Terms";
+"privacy" = "Privacy";
+"fizz_master" = "FIZZ MASTER";
+"level_rank" = "Level %d • Rank #%d";
+"game_mode" = "GAME MODE";
