@@ -15,3 +15,27 @@ struct Theme {
     endPoint: .bottom
   )
 }
+
+// MARK: - グラスモーフィズム（透き通ったガラス風）
+struct GlassPanelModifier: ViewModifier {
+  var cornerRadius: CGFloat = 12
+  var opacity: Double = 0.25
+
+  func body(content: Content) -> some View {
+    content
+      .background(
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .fill(.ultraThinMaterial)
+          .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+              .fill(Color.white.opacity(opacity))
+          )
+      )
+  }
+}
+
+extension View {
+  func glassPanel(cornerRadius: CGFloat = 12, opacity: Double = 0.25) -> some View {
+    modifier(GlassPanelModifier(cornerRadius: cornerRadius, opacity: opacity))
+  }
+}
