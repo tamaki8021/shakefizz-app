@@ -14,14 +14,6 @@ struct ResultView: View {
       VStack(spacing: 0) {
         // Top Bar
         HStack {
-          Button(action: { viewModel.resetGame() }) {
-            Image(systemName: "xmark")
-              .font(.title3)
-              .foregroundColor(.white)
-              .padding(10)
-              .background(Circle().fill(Color.white.opacity(0.1)))
-          }
-
           Spacer()
 
           VStack(spacing: 2) {
@@ -40,25 +32,9 @@ struct ResultView: View {
         if let session = viewModel.currentSession {
           ScrollView {
             VStack(spacing: 30) {
-              // Tier 1: Rank and Score Section (最初に表示)
+              // Tier 1: Score Section (最初に表示)
               if showTier1 {
                 VStack(spacing: 15) {
-                  // Rank Badge (角丸の長方形、光るピンク/紫の枠)
-                  RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(hex: session.rank.colorHex).opacity(0.1))
-                    .frame(width: 200, height: 120)
-                    .overlay(
-                      RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color(hex: session.rank.colorHex), lineWidth: 4)
-                        .shadow(color: Color(hex: session.rank.colorHex), radius: 20)
-                    )
-                    .overlay(
-                      Text(session.rank.rawValue)
-                        .font(.system(size: 72, weight: .black))
-                        .foregroundColor(.white)
-                    )
-                    .padding(.top, 20)
-
                   // Score
                   VStack(spacing: 8) {
                     if session.score <= 0.0 {
