@@ -3,7 +3,7 @@ import SwiftUI
 struct PlayScreenView: View {
   @ObservedObject var viewModel: GameViewModel
   @ObservedObject var shakeManager: ShakeManager
-  @StateObject private var particleSystem = ParticleSystem()
+
   @State private var showExitConfirmation = false
 
   init(viewModel: GameViewModel) {
@@ -14,19 +14,40 @@ struct PlayScreenView: View {
   var body: some View {
     GeometryReader { geometry in
       ZStack {
-        // Background color based on drink type
+        // 1. Background (Deep liquid color at the back)
         if let drink = viewModel.selectedDrink {
           drink.backgroundColor
+            .brightness(-0.3)  // Darker background for depth
             .ignoresSafeArea()
+        } else {
+          Color.black.ignoresSafeArea()
         }
 
-        // Bubble particles
-        ForEach(particleSystem.particles) { particle in
-          Circle()
-            .fill(Color.white.opacity(particle.opacity))
-            .frame(width: particle.size, height: particle.size)
-            .position(particle.position)
+        // 2. Liquid Animation (Fluid)
+        if let drink = viewModel.selectedDrink {
+          LiquidWaveView(
+            color: drink.backgroundColor,
+            roll: shakeManager.roll,
+            pitch: shakeManager.pitch,
+            agitation: shakeManager.liquidAgitation
+          )
+          .ignoresSafeArea()
         }
+
+        // 3. Bubbles (Carbonation)
+        if viewModel.selectedDrink != nil {
+          BubblesEffectView(
+            density: 40,
+            speedMultiplier: 1.0 + (shakeManager.liquidAgitation * 2.0),  // Faster when shaken
+            roll: shakeManager.roll
+          )
+          .ignoresSafeArea()
+        }
+
+        // 4. Can Body Overlay (Glass/Metal/Condensation)
+        CanBodyOverlay(condensationAmount: 0.4 + (shakeManager.liquidAgitation * 0.3))
+          .ignoresSafeArea()
+          .allowsHitTesting(false)
 
         // UI Elements
         VStack(spacing: 0) {
@@ -54,72 +75,68 @@ struct PlayScreenView: View {
           }
           .padding()
 
+          // タイマー表示（上部）
+          if !viewModel.isTimeUp && !viewModel.isCountingDown {
+            VStack(spacing: 4) {
+              ZStack {
+                Circle()
+                  .stroke(Color.gray.opacity(0.3), lineWidth: 4)
+                  .frame(width: 56, height: 56)
+
+                Circle()
+                  .trim(from: 0, to: CGFloat(viewModel.gameTimeRemaining / 15.0))
+                  .stroke(
+                    timerColor(for: viewModel.gameTimeRemaining),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                  )
+                  .frame(width: 56, height: 56)
+                  .rotationEffect(.degrees(-90))
+                  .animation(.linear(duration: 0.1), value: viewModel.gameTimeRemaining)
+
+                Text(
+                  String(
+                    format: "%02d:%02d",
+                    Int(viewModel.gameTimeRemaining) / 60,
+                    Int(viewModel.gameTimeRemaining) % 60)
+                )
+                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .foregroundColor(timerColor(for: viewModel.gameTimeRemaining))
+              }
+            }
+            .padding(.top, 4)
+          }
+
           Spacer()
 
-          // Bottom Timer and Action Buttons
-          VStack(spacing: 20) {
-            // Timer Display with Enhanced Feedback
-            if !viewModel.isTimeUp && !viewModel.isCountingDown {
-              VStack(spacing: 8) {
-                // Circular Progress Bar
-                ZStack {
-                  Circle()
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 4)
-                    .frame(width: 60, height: 60)
+          // 下部: TAP TO BUILD PRESSURE のみ
+          if !viewModel.isTimeUp && !viewModel.isCountingDown {
+            Button(action: {
+              let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+              impactFeedback.impactOccurred()
+              viewModel.performTapAction()
+            }) {
+              HStack {
+                Text(LocalizedStringKey("tap_to_build"))
+                  .font(.system(size: 18, weight: .bold))
+                  .foregroundColor(.white)
 
-                  Circle()
-                    .trim(from: 0, to: CGFloat(viewModel.gameTimeRemaining / 15.0))
-                    .stroke(
-                      timerColor(for: viewModel.gameTimeRemaining),
-                      style: StrokeStyle(lineWidth: 4, lineCap: .round)
-                    )
-                    .frame(width: 60, height: 60)
-                    .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 0.1), value: viewModel.gameTimeRemaining)
-
-                  Text(
-                    String(
-                      format: "%02d:%02d",
-                      Int(viewModel.gameTimeRemaining) / 60,
-                      Int(viewModel.gameTimeRemaining) % 60)
-                  )
-                  .font(.system(size: 12, weight: .black, design: .monospaced))
-                  .foregroundColor(timerColor(for: viewModel.gameTimeRemaining))
-                }
+                Image(systemName: "hand.tap.fill")
+                  .foregroundColor(.white)
               }
+              .frame(maxWidth: .infinity)
+              .padding(.horizontal, 24)
+              .padding(.vertical, 16)
+              .background(Color(white: 0.15, opacity: 0.8))
+              .cornerRadius(12)
+              .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                  .stroke(Color.neonCyan, lineWidth: 2)
+              )
             }
-
-            // Action Buttons
-            if !viewModel.isTimeUp && !viewModel.isCountingDown {
-              // TAP TO BUILD PRESSURE Button
-              Button(action: {
-                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                impactFeedback.impactOccurred()
-                viewModel.performTapAction()
-              }) {
-                HStack {
-                  Text(LocalizedStringKey("tap_to_build"))
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
-
-                  Image(systemName: "hand.tap.fill")
-                    .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
-                .background(Color(white: 0.15, opacity: 0.8))
-                .cornerRadius(12)
-                .overlay(
-                  RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.neonCyan, lineWidth: 2)
-                )
-              }
-              .disabled(viewModel.isCountingDown)
-            }
+            .disabled(viewModel.isCountingDown)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 30)
           }
-          .padding(.horizontal)
-          .padding(.bottom, 30)
         }
 
         // TIME UP Overlay
@@ -170,14 +187,7 @@ struct PlayScreenView: View {
           .zIndex(100)
         }
       }
-      .onAppear {
-        particleSystem.start(screenSize: geometry.size) { [weak shakeManager] in
-          shakeManager?.shakeIntensity ?? 0.0
-        }
-      }
-      .onDisappear {
-        particleSystem.stop()
-      }
+
       .alert(NSLocalizedString("alert_title", comment: ""), isPresented: $showExitConfirmation) {
         Button(LocalizedStringKey("alert_continue"), role: .cancel) {
           showExitConfirmation = false
