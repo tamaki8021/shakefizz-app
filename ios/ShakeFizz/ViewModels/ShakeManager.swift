@@ -11,6 +11,9 @@ class ShakeManager: ObservableObject {
   @Published var projectedHeight: Double = 0.0
   @Published var isShaking: Bool = false
   @Published var shakeIntensity: Double = 0.0
+  @Published var roll: Double = 0.0
+  @Published var pitch: Double = 0.0
+  @Published var liquidAgitation: Double = 0.0  // 0.0 (calm) to 1.0+ (turbulent)
 
   // Game constants
   private let shakeThreshold: Double = 1.2  // G-force threshold to count as shake
@@ -50,17 +53,23 @@ class ShakeManager: ObservableObject {
 
     DispatchQueue.main.async {
       self.shakeIntensity = magnitude
+      self.roll = data.attitude.roll
+      self.pitch = data.attitude.pitch
 
       if magnitude > 0.5 {
         self.isShaking = true
         // Add to pressure based on intensity
         let gain = magnitude * 0.1 * self.fizzModifier
         self.currentPressure = min(self.currentPressure + gain, self.maxPressure)
+
+        // Increase liquid agitation rapidly when shaking
+        // Cap at 1.0 or slightly higher for extreme shaking
+        self.liquidAgitation = min(self.liquidAgitation + (magnitude * 0.05), 1.5)
       } else {
         self.isShaking = false
-        // Decay pressure slightly if not shaking hard? Or maybe just keep it?
-        // For this game, maybe we don't decay to keep the "charge" feeling,
-        // or decay slowly to encourage continuous shaking.
+        // Decay agitation to simulate liquid settling
+        // exponential decay: reduces by ~5% every frame (60fps) -> fast settling but not instant
+        self.liquidAgitation = max(self.liquidAgitation * 0.95, 0.0)
       }
 
       // Calculate height directly from pressure

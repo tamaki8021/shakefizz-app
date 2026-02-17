@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct ShakeFizzApp: App {
   @StateObject private var languageManager = LanguageManager()
+  @StateObject private var settingsManager = SettingsManager()
 
   var body: some Scene {
     WindowGroup {
@@ -10,6 +11,7 @@ struct ShakeFizzApp: App {
         .preferredColorScheme(.dark)  // Force dark mode as per design
         .environment(\.locale, languageManager.locale)
         .environmentObject(languageManager)
+        .environmentObject(settingsManager)
     }
   }
 }
