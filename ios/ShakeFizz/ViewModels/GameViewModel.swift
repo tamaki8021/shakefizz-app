@@ -17,15 +17,51 @@ class GameViewModel: ObservableObject {
   @Published var isTimeUp: Bool = false
   @Published var currentSession: Session? = nil
 
+  /// スタミナ（炭酸の残り回数）1プレイで1消費。0で「炭酸切れ」→ 広告視聴や時間経過で補充
+  @Published var fizzRemaining: Int = 5
+  /// 所持通貨（クラウン等）。マネタイズ・アンロック用
+  @Published var currency: Int = 2450
+  private let maxFizz = 5
+  private let fizzUserDefaultsKey = "shakefizz_fizz_remaining"
+  private let currencyUserDefaultsKey = "shakefizz_currency"
+
+  init() {
+    fizzRemaining = min(maxFizz, UserDefaults.standard.object(forKey: fizzUserDefaultsKey) as? Int ?? maxFizz)
+    currency = UserDefaults.standard.object(forKey: currencyUserDefaultsKey) as? Int ?? 2450
+  }
+
   // Dependencies
   let shakeManager = ShakeManager()
   private var cancellables = Set<AnyCancellable>()
   private var countdownTimer: AnyCancellable?
   private var gameTimer: AnyCancellable?
 
-  init() {
-    // Forward shake updates if needed, or Views can observe ShakeManager directly
-    // For MVP, we pass ShakeManager to views via EnvironmentObject or directly
+  func consumeFizzIfAvailable() -> Bool {
+    guard fizzRemaining > 0 else { return false }
+    fizzRemaining -= 1
+    UserDefaults.standard.set(fizzRemaining, forKey: fizzUserDefaultsKey)
+    return true
+  }
+
+  func refillFizz(amount: Int = 1) {
+    fizzRemaining = min(maxFizz, fizzRemaining + amount)
+    UserDefaults.standard.set(fizzRemaining, forKey: fizzUserDefaultsKey)
+  }
+
+  func addCurrency(_ value: Int) {
+    currency += value
+    UserDefaults.standard.set(currency, forKey: currencyUserDefaultsKey)
+  }
+
+  /// リーグ別ベストスコア（m）。未実装時はグローバルベストを返す
+  func bestMeters(for drinkType: DrinkType) -> Double? {
+    let global = UserDefaults.standard.double(forKey: "bestScore")
+    return global > 0 ? global : nil
+  }
+
+  /// リーグ別ランク表示用。未実装時はプレースホルダー
+  func rankNumber(for drinkType: DrinkType) -> Int? {
+    nil  // オンラインランキング実装時に返す
   }
 
   func selectDrink(_ type: DrinkType) {
@@ -34,11 +70,15 @@ class GameViewModel: ObservableObject {
   }
 
   func proceedToWarning() {
-    guard selectedDrink != nil else { return }
+    guard selectedDrink != nil, fizzRemaining > 0 else { return }
     gameState = .safetyWarning
   }
 
   func acknowledgeWarning() {
+    guard consumeFizzIfAvailable() else {
+      // 炭酸切れ時はここに来ない想定（スタートボタン無効化で防ぐ）
+      return
+    }
     gameState = .playing
     // Reset shake manager for new game
     shakeManager.reset()
@@ -107,7 +147,6 @@ class GameViewModel: ObservableObject {
     guard let drink = selectedDrink else { return }
 
     let score = shakeManager.projectedHeight
-    let rank = Rank.calculate(meters: score)
     let topSpeed = 0.0  // Placeholder for MVP
     let totalShakes = Int(shakeManager.currentPressure)  // Proxy for shakes
 
@@ -117,7 +156,6 @@ class GameViewModel: ObservableObject {
 
     let session = Session(
       score: score,
-      rank: rank,
       drinkType: drink,
       topSpeed: topSpeed,
       totalShakes: totalShakes,
@@ -130,18 +168,17 @@ class GameViewModel: ObservableObject {
 
     // Update best score if this is a new personal best
     if isPersonalBest {
-      updateBestScore(score: score, rank: rank, drinkType: drink)
+      updateBestScore(score: score, drinkType: drink)
     }
 
     gameState = .result
   }
 
-  private func updateBestScore(score: Double, rank: Rank, drinkType: DrinkType) {
+  private func updateBestScore(score: Double, drinkType: DrinkType) {
     let currentBest = UserDefaults.standard.double(forKey: "bestScore")
 
     if score > currentBest {
       UserDefaults.standard.set(score, forKey: "bestScore")
-      UserDefaults.standard.set(rank.rawValue, forKey: "bestRank")
       UserDefaults.standard.set(drinkType.displayName, forKey: "bestDrink")
 
       let formatter = RelativeDateTimeFormatter()
