@@ -10,22 +10,31 @@ struct LeaguePlayer: Identifiable {
 }
 
 // League Types for Navigation
-enum LeagueType: String, CaseIterable, Identifiable {
-  case ultraCola = "ultra_cola"
-  case limeBurst = "lime_burst"
-  case beastFuel = "beast_fuel"
-  case gingerShock = "ginger_shock"
-  case global = "Global Rank"
+enum LeagueType: Identifiable, CaseIterable, Hashable {
+  case drink(DrinkType)
+  case global
 
-  var id: String { self.rawValue }
+  static var allCases: [LeagueType] {
+    DrinkType.allCases.map { .drink($0) } + [.global]
+  }
+
+  var id: String {
+    switch self {
+    case .drink(let type): return type.id
+    case .global: return "global"
+    }
+  }
 
   var displayName: String {
     switch self {
-    case .ultraCola: return "Ultra Cola League"
-    case .limeBurst: return "Lime Burst League"
-    case .beastFuel: return "Beast Fuel League"
-    case .gingerShock: return "Ginger Shock League"
-    case .global: return "Global Rank"
+    case .drink(let type):
+      // DrinkType の displayName は LocalizedStringKey なので、
+      // ここでは簡易的に rawValue から生成するか、LocalizedStringKey を返すように調整が必要
+      // MVP なので一旦 rawValue ベースの文字列を作成
+      let name = type.rawValue.split(separator: "_").map { $0.capitalized }.joined(separator: " ")
+      return "\(name) League"
+    case .global:
+      return "Global Rank"
     }
   }
 
@@ -38,10 +47,7 @@ enum LeagueType: String, CaseIterable, Identifiable {
 
   var color: Color {
     switch self {
-    case .ultraCola: return Color(red: 0.95, green: 0.10, blue: 0.15)
-    case .limeBurst: return Color(red: 0.28, green: 0.95, blue: 0.28)
-    case .beastFuel: return Color(red: 0.08, green: 0.62, blue: 0.96)
-    case .gingerShock: return Color(red: 0.98, green: 0.85, blue: 0.15)
+    case .drink(let type): return type.accentColor
     case .global: return .neonCyan
     }
   }
@@ -52,7 +58,7 @@ struct LeagueRankingView: View {
   let currentRank: Int
   let currentScore: Double
   
-  @State private var selectedLeague: LeagueType = .ultraCola
+  @State private var selectedLeague: LeagueType = .drink(.ultraCola)
 
   // Mock Data generation (centered around current player and top 3)
   private func rankingData(for league: LeagueType) -> [LeaguePlayer] {
@@ -61,14 +67,18 @@ struct LeagueRankingView: View {
     // Create base score modifier depending on league
     let scoreModifier: Double
     switch league {
-    case .ultraCola: scoreModifier = 0.85
-    case .limeBurst: scoreModifier = 0.70
-    case .beastFuel: scoreModifier = 0.95
-    case .gingerShock: scoreModifier = 0.95
-    case .global: scoreModifier = 1.0
+    case .drink(let type):
+      scoreModifier = Double(type.fizzPercent) / 100.0
+    case .global:
+      scoreModifier = 1.0
     }
 
-    let isUserLeague = (league == .ultraCola) // MVP: User is always in Ultra Cola league by default
+    let isUserLeague: Bool
+    if case .drink(let type) = league {
+      isUserLeague = (type == .ultraCola) // MVP: User is always in Ultra Cola league by default
+    } else {
+      isUserLeague = false
+    }
     let targetRank = isUserLeague ? currentRank : Int.random(in: 100...500)
     let targetScore = currentScore * scoreModifier
 
