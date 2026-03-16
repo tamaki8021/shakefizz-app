@@ -37,9 +37,9 @@
 // Result Screen
 "mission_complete" = "MISSION COMPLETE";
 "rank_label" = "RANK";
-"meters_label" = "METERS";
+"meters_label" = "M";
 "try_again" = "TRY AGAIN";
-"change_drink" = "CHANGE DRINK";
+"home" = "HOME";
 "no_data" = "No Result Data";
 
 // Settings
@@ -63,6 +63,8 @@
 
 // Play Screen Missing
 "tap_to_build" = "TAP";
+"tap_anywhere" = "TAP ANYWHERE";
+"shake_device" = "SHAKE DEVICE!";
 "alert_title" = "Quit Game?";
 "alert_message" = "Score will not be saved.";
 "alert_continue" = "Continue";
@@ -117,3 +119,97 @@
 "fizz_master" = "FIZZ MASTER";
 "level_rank" = "Level %d • Rank #%d";
 "game_mode" = "GAME MODE";
+
+// Ranking
+"ranking_rank" = "RANK";
+"ranking_player" = "PLAYER";
+"ranking_score" = "SCORE";
+"ranking_my_rank" = "MY RANK";
+"ranking_view_league" = "View League Ranking";
+"league_silver" = "Silver League";
+
+// Drink Selection - New UI Localization
+"fizz_meter" = "FIZZ METER";
+"out_of_fizz_refill_prompt" = "Out of Fizz — tap + to refill";
+"lime_burst_fever" = "LIME BURST FEVER!";
+"ends_in_time %@" = "Ends in %@";
+"live_now" = "LIVE NOW";
+"weekly_event" = "WEEKLY EVENT:";
+"reward_2x" = "2X REWARDS";
+"advertisement" = "ADVERTISEMENT";
+"support_shakefizz" = "Support ShakeFizz!";
+"tap_to_learn_more" = "Tap to learn more";
+"how_to_play_upper" = "HOW TO PLAY";
+"how_to_play_title" = "How to Play";
+"select_and_shake" = "Select & Shake!";
+"fill_the_gauge" = "Fill the gauge to win";
+"help_description" = "Shake your device during the countdown to build pressure. When time runs out, your spray height (m) is recorded. Compete on the leaderboard!";
+"out_of_fizz" = "OUT OF ";
+"fizz_exclamation" = "FIZZ!";
+"out_of_fizz_desc" = "Your arms need a rest, or grab a\nquick refill to keep shaking!";
+"free_refill" = "FREE REFILL";
+"watch_video" = "WATCH VIDEO";
+"or_wait_for_recharge" = "OR WAIT FOR RECHARGE";
+"slow" = "SLOW";
+"active_upper" = "ACTIVE";
+"rank_number %lld" = "RANK #%lld";
+"rank_number_none" = "RANK #—";
+"best_meters_format %@" = "BEST %@m";
+"best_meters_none" = "BEST —";
+"unlock_req" = "UNLOCK REQ.";
+"unlock_beast_fuel" = "Reach Top 50 in Cola League";
+"unlock_ginger_shock" = "Reach Top 10 in Beast Fuel";
+"km_h" = "km/h";
+"just_now" = "Just now";
+
+// Result Screen - Emotional Redesign (30 Levels)
+"share" = "SHARE YOUR SCORE";
+"share_result_text" = "I hit RANK %@ at %.1fm in ShakeFizz! Can you beat me? #ShakeFizz";
+
+// League Names (per drink)
+"league_ultra_cola" = "ULTRA COLA LEAGUE";
+"league_lime_burst" = "LIME BURST LEAGUE";
+"league_beast_fuel" = "BEAST FUEL LEAGUE";
+"league_ginger_shock" = "GINGER SHOCK LEAGUE";
+"league_rank_label" = "NO.";
+"comp_0" = "💨 It's totally flat...";
+"comp_0_1" = "🥫 Height of one soda can!";
+"comp_0_3" = "🐶 Jumped over a small dog!";
+"comp_0_5" = "🪑 Just about chair height!";
+"comp_0_8" = "🚲 Higher than a bicycle!";
+"comp_1" = "🚶 Reached waist height!";
+"comp_1_5" = "🧍 Passed human height!";
+"comp_2" = "🚪 Taller than a room door!";
+"comp_3" = "🛖 Hit the roof of the first floor!";
+
+// Mid Zone (5m ~ 30m)
+"comp_5" = "🦒 Eye level with a giraffe!";
+"comp_7" = "🏠 Cleared a 2-story house!";
+"comp_10" = "🌳 Taller than a big park tree!";
+"comp_15" = "🏢 5-story building class!";
+"comp_20" = "🏢 Reached the building roof!";
+"comp_30" = "🦕 Huge dinosaur size eruption!";
+
+// Advanced Zone (50m ~ 1000m)
+"comp_50" = "💥 Fizz power awakened!!";
+"comp_80" = "🗽 At the feet of the Statue of Liberty!";
+"comp_100" = "🗽 Over the Statue of Liberty!?";
+"comp_150" = "🏜️ Pyramid scale eruption!!";
+"comp_200" = "☁️ Looking down at city buildings!";
+"comp_300" = "🗼 Tokyo Tower is approaching...!";
+"comp_333" = "🗼 Standing next to Tokyo Tower!!";
+"comp_500" = "💥 Legendary pro shaker born!!";
+"comp_630" = "🗼 Beyond the Sky Tree!!";
+"comp_1000" = "✈️ Airplanes passing by!";
+
+// Legend Zone (2000m ~ 100,000m+)
+"comp_2000" = "☁️ Pierced right through the clouds!!";
+"comp_3776" = "🗻 Mt. Fuji class massive panic!!!";
+"comp_10000" = "✈️ A pillar of fizz looking down on jets!";
+"comp_30000" = "🎈 Reached the stratosphere! Can't breathe!";
+"comp_100000" = "🚀 Reached the edge of space!! Galaxy Shake!";
+"rank_up_format" = "UP %d PLACES!";
+"rank_down_format" = "DOWN %d PLACES";
+"beat_player_format" = "Just +%.1fm to pass #%d!";
+"league_position_format" = "LEAGUE RANK #%d";
+

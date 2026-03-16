@@ -37,9 +37,9 @@
 // Result Screen
 "mission_complete" = "ミッション完了";
 "rank_label" = "ランク";
-"meters_label" = "メートル";
+"meters_label" = "M";
 "try_again" = "もう一度やる";
-"change_drink" = "ドリンクを変える";
+"home" = "ホーム";
 "no_data" = "データなし";
 
 // Settings
@@ -63,6 +63,8 @@
 
 // Play Screen Missing
 "tap_to_build" = "タップ";
+"tap_anywhere" = "画面をタップ";
+"shake_device" = "スマホを振れ！";
 "alert_title" = "プレイを中断しますか？";
 "alert_message" = "スコアは記録されません";
 "alert_continue" = "続行";
@@ -117,3 +119,97 @@
 "fizz_master" = "フィズマスター";
 "level_rank" = "レベル %d • ランク #%d";
 "game_mode" = "ゲームモード";
+
+// Ranking
+"ranking_rank" = "ランク";
+"ranking_player" = "プレイヤー";
+"ranking_score" = "スコア";
+"ranking_my_rank" = "マイランク";
+"ranking_view_league" = "リーグランキングを見る";
+"league_silver" = "シルバーリーグ";
+
+// Drink Selection - New UI Localization
+"fizz_meter" = "炭酸メーター";
+"out_of_fizz_refill_prompt" = "炭酸切れ — + をタップして補充";
+"lime_burst_fever" = "ライムバースト・フィーバー！";
+"ends_in_time %@" = "残り %@";
+"live_now" = "開催中";
+"weekly_event" = "イベント:";
+"reward_2x" = "報酬2倍";
+"advertisement" = "広告";
+"support_shakefizz" = "ShakeFizzを応援！";
+"tap_to_learn_more" = "タップして詳細を見る";
+"how_to_play_upper" = "遊び方";
+"how_to_play_title" = "遊び方";
+"select_and_shake" = "選んでシェイク！";
+"fill_the_gauge" = "ゲージをためてトップを目指せ";
+"help_description" = "カウントダウン中にスマホを振ってプレッシャーを高めよう。時間切れ時に噴射した高さ(m)が記録されるぞ。リーダーボードで競い合え！";
+"out_of_fizz" = "炭酸が";
+"fizz_exclamation" = "ない！";
+"out_of_fizz_desc" = "腕を休ませるか、\nすぐに補充してシェイクを続けよう！";
+"free_refill" = "無料補充";
+"watch_video" = "動画を見る";
+"or_wait_for_recharge" = "または回復を待つ";
+"slow" = "遅い";
+"active_upper" = "選択中";
+"rank_number %lld" = "ランク #%lld";
+"rank_number_none" = "ランク #—";
+"best_meters_format %@" = "ベスト %@m";
+"best_meters_none" = "ベスト —";
+"unlock_req" = "解放条件";
+"unlock_beast_fuel" = "コーラリーグでトップ50に入る";
+"unlock_ginger_shock" = "ビーストフューエルでトップ10に入る";
+"km_h" = "km/h";
+"just_now" = "さっき";
+
+// リザルト画面 - 感情爆発リデザイン（30段階スケール）
+"share" = "SHARE YOUR SCORE";
+"share_result_text" = "ShakeFizzで【RANK %@ %.1fm】を記録！お前は超える？ #ShakeFizz";
+
+// リーグ名（缶別）
+"league_ultra_cola" = "ウルトラコーラリーグ";
+"league_lime_burst" = "ライムバーストリーグ";
+"league_beast_fuel" = "ビーストフゥールリーグ";
+"league_ginger_shock" = "ジンジャーショックリーグ";
+"league_rank_label" = "NO.";
+"comp_0" = "💨 炭酸が抜けている…";
+"comp_0_1" = "🥫 缶ジュース1本分！";
+"comp_0_3" = "🐶 小型犬を飛び越えた！";
+"comp_0_5" = "🪑 ちょうど椅子くらいの高さ！";
+"comp_0_8" = "🚲 自転車を越えるジャンプ！";
+"comp_1" = "🚶 人の腰くらいまで到達！";
+"comp_1_5" = "🧍 人間の身長を突破！";
+"comp_2" = "🚪 部屋のドアより高いぞ！";
+"comp_3" = "🛖 1階の屋根に届いた！";
+
+// 中級・街中ゾーン (5m ~ 30m)
+"comp_5" = "🦒 キリンと目が合う高さ！";
+"comp_7" = "🏠 2階建ての家を完全に越えた！";
+"comp_10" = "🌳 公園の大きな木を超越！";
+"comp_15" = "🏢 5階建てのビルクラス！";
+"comp_20" = "🏢 ビルの屋上に到達！";
+"comp_30" = "🦕 巨大恐竜サイズの大噴出！";
+
+// 上級・ランドマークゾーン (50m ~ 1000m)
+"comp_50" = "💥 炭酸パワー覚醒！！";
+"comp_80" = "🗽 自由の女神の足元！";
+"comp_100" = "🗽 自由の女神を越えた！？";
+"comp_150" = "🏜️ ピラミッド級の大噴火！！";
+"comp_200" = "☁️ 街のビル群を見下ろす高さ！";
+"comp_300" = "🗼 東京タワーが迫ってくる…！";
+"comp_333" = "🗼 東京タワーと肩を並べた！！";
+"comp_500" = "💥 伝説のプロシェイカー爆誕！！";
+"comp_630" = "🗼 スカイツリーをも超越！！";
+"comp_1000" = "✈️ 飛行機とすれ違うレベル！";
+
+// 伝説・規格外ゾーン (2000m ~ 100,000m+)
+"comp_2000" = "☁️ 雲海を完全に突き抜けた！！";
+"comp_3776" = "🗻 富士山クラスの大パニック！！！";
+"comp_10000" = "✈️ ジェット機を見下ろす炭酸の柱！";
+"comp_30000" = "🎈 成層圏へ到達！息ができない！";
+"comp_100000" = "🚀 宇宙の入り口へ到達！！ギャラクシーシェイク！";
+"rank_up_format" = "%d位アップ！";
+"rank_down_format" = "%d位ダウン";
+"beat_player_format" = "#%d にあと +%.1fm で追いつける！";
+"league_position_format" = "リーグ順位 #%d";
+
