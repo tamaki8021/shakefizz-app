@@ -38,7 +38,7 @@ enum DrinkType: String, Codable, CaseIterable, Identifiable {
 
   var isLocked: Bool {
     switch self {
-    case .beastFuel: return true
+    case .gingerShock: return true
     default: return false
     }
   }
@@ -48,11 +48,11 @@ enum DrinkType: String, Codable, CaseIterable, Identifiable {
     case .ultraCola:
       return Color(red: 0.071, green: 0.008, blue: 0.027)  // Near Black Cola #120207
     case .limeBurst:
-      return Color(red: 0.20, green: 0.80, blue: 0.20)  // Lime green #32CD32
+      return Color(red: 0.008, green: 0.071, blue: 0.008)  // Deep Lime Black #021202
     case .beastFuel:
-      return Color(red: 0.04, green: 0.09, blue: 0.16)  // Deep blue #0A1628
+      return Color(red: 0.008, green: 0.016, blue: 0.071)  // Deep Blue Black #020412
     case .gingerShock:
-      return Color(red: 0.75, green: 0.45, blue: 0.10)  // Golden Amber #BF731A
+      return Color(red: 0.071, green: 0.039, blue: 0.008)  // Deep Ginger Black #120A02
     }
   }
 
