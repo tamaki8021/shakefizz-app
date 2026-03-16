@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct NeonButton: View {
-  let title: String
+  let title: LocalizedStringKey
   let color: Color
   let icon: String?
   let action: () -> Void

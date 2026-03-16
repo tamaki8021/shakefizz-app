@@ -6,6 +6,7 @@ struct DrinkSelectionView: View {
   @State private var showSettings: Bool = false
   @State private var showHelp: Bool = false
   @State private var showOutOfFizzModal: Bool = false
+  @State private var showRankingSheet: Bool = false
   @State private var lockedDrinkType: DrinkType?
 
   private let columns = [
@@ -34,6 +35,9 @@ struct DrinkSelectionView: View {
       .sheet(isPresented: $showHelp) {
         HelpSheetView()
       }
+      .sheet(isPresented: $showRankingSheet) {
+        LeagueRankingView(currentRank: 42, currentScore: 85.5)  // Mock current rank/score for MVP
+      }
   }
 
   @ViewBuilder
@@ -54,7 +58,8 @@ struct DrinkSelectionView: View {
       BackgroundView()
       VStack(spacing: 0) {
         topBarView
-        EventBannerView()
+        // イベント告知バナー / Carousel
+        BannerCarouselView()
           .padding(.horizontal, 16)
           .padding(.top, 12)
         drinkGridScrollView
@@ -76,7 +81,7 @@ struct DrinkSelectionView: View {
   private var fizzMeterPanel: some View {
     HStack(spacing: 8) {
       VStack(alignment: .leading, spacing: 4) {
-        Text("FIZZ METER")
+        Text(LocalizedStringKey("fizz_meter"))
           .font(.system(size: 10, weight: .bold))
           .foregroundColor(.neonCyan)
         // .foregroundColor(.white.opacity(0.9))
@@ -111,25 +116,28 @@ struct DrinkSelectionView: View {
 
   private var profileHUDPanel: some View {
     HStack(spacing: 8) {
+      // League Rank / Currency Button
+      Button(action: { showRankingSheet = true }) {
+        HStack(spacing: 4) {
+          Image(systemName: "crown.fill")
+            .font(.system(size: 12))
+            .foregroundColor(.neonYellow)
+          Text("\(viewModel.currency)")
+            .font(.system(size: 14, weight: .bold))
+            .foregroundColor(.white)
+            .monospacedDigit()
+            .fixedSize()
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Capsule().fill(Color.white.opacity(0.1)))
+      }
+
       Button(action: { showSettings = true }) {
         Image(systemName: "person.crop.circle.fill")
           .font(.system(size: 24))
           .foregroundColor(.white.opacity(0.8))
       }
-
-      HStack(spacing: 4) {
-        Image(systemName: "crown.fill")
-          .font(.system(size: 12))
-          .foregroundColor(.neonYellow)
-        Text("\(viewModel.currency)")
-          .font(.system(size: 14, weight: .bold))
-          .foregroundColor(.white)
-          .monospacedDigit()
-          .fixedSize()
-      }
-      .padding(.horizontal, 8)
-      .padding(.vertical, 4)
-      .background(Capsule().fill(Color.white.opacity(0.1)))
 
       Button(action: { showHelp = true }) {
         Image(systemName: "questionmark.circle.fill")
@@ -138,7 +146,7 @@ struct DrinkSelectionView: View {
           .padding(6)
       }
     }
-    .padding(.horizontal, 4)  // パディングを少し減らす
+    .padding(.horizontal, 4)
     .padding(.vertical, 4)
   }
 
@@ -189,7 +197,7 @@ struct DrinkSelectionView: View {
   private var bottomButtonStack: some View {
     VStack(spacing: 12) {
       if viewModel.fizzRemaining == 0 {
-        Text("Out of Fizz — tap + to refill")
+        Text(LocalizedStringKey("out_of_fizz_refill_prompt"))
           .font(.system(size: 13, weight: .medium))
           .foregroundColor(.neonMagenta)
           .shadow(color: .neonMagenta.opacity(0.5), radius: 4)
@@ -235,15 +243,57 @@ struct DrinkSelectionView: View {
 }
 
 // MARK: - イベント告知バナー
+// MARK: - Banner Carousel
+struct BannerCarouselView: View {
+  @State private var currentPage = 0
+  @State private var slideCounter = 0
+  @State private var autoSlideTimer: Timer?
+
+  private let pageCount = 3
+  private let autoSlideInterval: TimeInterval = 4.0
+
+  var body: some View {
+    TabView(selection: $currentPage) {
+      EventBannerView().tag(0)
+      LinkAdBannerView().tag(1)
+      HowToPlayEventBannerView().tag(2)
+    }
+    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+    .frame(height: 100)
+    .padding(.bottom, 4)
+    .onChange(of: slideCounter) { _, newValue in
+      withAnimation(.easeInOut(duration: 0.35)) {
+        currentPage = newValue % pageCount
+      }
+    }
+    .onAppear {
+      startAutoSlide()
+    }
+    .onDisappear {
+      autoSlideTimer?.invalidate()
+      autoSlideTimer = nil
+    }
+  }
+
+  private func startAutoSlide() {
+    autoSlideTimer?.invalidate()
+    let timer = Timer.scheduledTimer(withTimeInterval: autoSlideInterval, repeats: true) { _ in
+      slideCounter += 1
+    }
+    autoSlideTimer = timer
+    RunLoop.main.add(timer, forMode: .common)
+  }
+}
+
+// MARK: - 1. Event Banner (Existing)
 struct EventBannerView: View {
-  private let eventTitle = "LIME BURST FEVER!"
+  private let eventTitle = LocalizedStringKey("lime_burst_fever")
   private let eventEndsIn = "14h"
-  private let rewardsTag = "2X REWARDS"
+  private let rewardsTag = LocalizedStringKey("reward_2x")
 
   var body: some View {
     eventBannerBackground
       .overlay(eventBannerContent)
-      .frame(height: 84)
   }
 
   private var eventBannerBackground: some View {
@@ -283,7 +333,7 @@ struct EventBannerView: View {
   private var eventBannerLeft: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack(spacing: 6) {
-        Text("LIVE NOW")
+        Text(LocalizedStringKey("live_now"))
           .font(.system(size: 9, weight: .black))
           .foregroundColor(.neonMagenta)
           .padding(.horizontal, 6)
@@ -292,11 +342,11 @@ struct EventBannerView: View {
         Image(systemName: "clock")
           .font(.system(size: 10))
           .foregroundColor(.white.opacity(0.8))
-        Text("Ends in \(eventEndsIn)")
+        Text("ends_in_time \(eventEndsIn)")
           .font(.system(size: 11, weight: .semibold))
           .foregroundColor(.white.opacity(0.9))
       }
-      Text("WEEKLY EVENT:")
+      Text(LocalizedStringKey("weekly_event"))
         .font(.system(size: 11, weight: .bold))
         .foregroundColor(.white.opacity(0.9))
       Text(eventTitle)
@@ -318,8 +368,88 @@ struct EventBannerView: View {
     .foregroundColor(.orange)
     .padding(.horizontal, 10)
     .padding(.vertical, 6)
-    .background(Capsule().fill(Color.orange.opacity(0.3)))
-    .padding(.trailing, 14)
+    .background(Capsule().fill(Color.black.opacity(0.3)))
+    .overlay(Capsule().stroke(Color.orange.opacity(0.5), lineWidth: 1))
+    .padding(.trailing, 10)
+  }
+}
+
+// MARK: - 2. Link Ad Banner
+struct LinkAdBannerView: View {
+  var body: some View {
+    RoundedRectangle(cornerRadius: 16)
+      .fill(.ultraThinMaterial)
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .fill(Color.black.opacity(0.4))
+      )
+      .overlay(
+        HStack {
+          VStack(alignment: .leading, spacing: 4) {
+            Text(LocalizedStringKey("advertisement"))
+              .font(.system(size: 9, weight: .bold))
+              .foregroundColor(.white.opacity(0.5))
+            Text(LocalizedStringKey("support_shakefizz"))
+              .font(.system(size: 16, weight: .bold))
+              .foregroundColor(.white)
+            Text(LocalizedStringKey("tap_to_learn_more"))
+              .font(.system(size: 12))
+              .foregroundColor(.neonCyan)
+          }
+          Spacer()
+          Image(systemName: "arrow.up.right.square.fill")
+            .font(.system(size: 24))
+            .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 20)
+      )
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+      )
+  }
+}
+
+// MARK: - 3. How To Play Banner
+struct HowToPlayEventBannerView: View {
+  var body: some View {
+    RoundedRectangle(cornerRadius: 16)
+      .fill(.ultraThinMaterial)
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .fill(
+            LinearGradient(
+              colors: [Color.neonCyan.opacity(0.3), Color.blue.opacity(0.2)],
+              startPoint: .leading,
+              endPoint: .trailing
+            )
+          )
+      )
+      .overlay(
+        HStack(spacing: 16) {
+          Image(systemName: "iphone.radiowaves.left.and.right")
+            .font(.system(size: 32))
+            .foregroundColor(.white)
+
+          VStack(alignment: .leading, spacing: 2) {
+            Text(LocalizedStringKey("how_to_play_upper"))
+              .font(.system(size: 10, weight: .black))
+              .foregroundColor(.neonCyan)
+            Text(LocalizedStringKey("select_and_shake"))
+              .font(.system(size: 16, weight: .heavy))
+              .foregroundColor(.white)
+            Text(LocalizedStringKey("fill_the_gauge"))
+              .font(.system(size: 12))
+              .foregroundColor(.white.opacity(0.8))
+          }
+          Spacer()
+        }
+        .padding(.horizontal, 20)
+      )
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+      )
   }
 }
 
@@ -331,19 +461,17 @@ struct HelpSheetView: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: 16) {
-          Text(
-            "Shake your device during the countdown to build pressure. When time runs out, your spray height (m) is recorded. Compete on the leaderboard!"
-          )
-          .font(.body)
-          .foregroundColor(.primary)
+          Text(LocalizedStringKey("help_description"))
+            .font(.body)
+            .foregroundColor(.primary)
         }
         .padding()
       }
-      .navigationTitle("How to Play")
+      .navigationTitle(LocalizedStringKey("how_to_play_title"))
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
-          Button("Done") { dismiss() }
+          Button(LocalizedStringKey("done")) { dismiss() }
         }
       }
     }
@@ -401,7 +529,7 @@ struct OutOfFizzModalView: View {
         outOfFizzTitle
 
         // Description
-        Text("Your arms need a rest, or grab a\nquick refill to keep shaking!")
+        Text(LocalizedStringKey("out_of_fizz_desc"))
           .font(.system(size: 15))
           .foregroundColor(.white.opacity(0.7))
           .multilineTextAlignment(.center)
@@ -421,10 +549,10 @@ struct OutOfFizzModalView: View {
                 .foregroundColor(.white.opacity(0.9))
 
               VStack(alignment: .leading, spacing: 0) {
-                Text("FREE REFILL")
+                Text(LocalizedStringKey("free_refill"))
                   .font(.system(size: 10, weight: .bold))
                   .foregroundColor(.white.opacity(0.8))
-                Text("WATCH VIDEO")
+                Text(LocalizedStringKey("watch_video"))
                   .font(.system(size: 18, weight: .black))
                   .foregroundColor(.white)
               }
@@ -437,7 +565,7 @@ struct OutOfFizzModalView: View {
         .padding(.top, 10)
 
         // Divider / Text
-        Text("OR WAIT FOR RECHARGE")
+        Text(LocalizedStringKey("or_wait_for_recharge"))
           .font(.system(size: 11, weight: .bold))
           .foregroundColor(.white.opacity(0.3))
           .padding(.top, 10)
@@ -454,7 +582,7 @@ struct OutOfFizzModalView: View {
 
           Spacer()
 
-          Text("SLOW")
+          Text(LocalizedStringKey("slow"))
             .font(.system(size: 10, weight: .black))
             .foregroundColor(.white)  // Text color on badge
             .padding(.horizontal, 8)
@@ -512,10 +640,10 @@ struct OutOfFizzModalView: View {
 
   private var outOfFizzTitle: some View {
     HStack(spacing: 0) {
-      Text("OUT OF ")
+      Text(LocalizedStringKey("out_of_fizz"))
         .font(.system(size: 32, weight: .bold))  // Slightly larger
         .foregroundColor(.white)
-      Text("FIZZ!")
+      Text(LocalizedStringKey("fizz_exclamation"))
         .font(.system(size: 32, weight: .black))  // Italic if possible, but system font italic weight black might be tricky. Using black for now.
         .italic()
         .foregroundColor(.neonMagenta)
@@ -730,11 +858,12 @@ struct DrinkCard: View {
   var bestMeters: Double?
 
   @State private var isPressed = false
+  @State private var lockPulse = false
 
-  private var unlockRequirementText: String {
+  private var unlockRequirementText: LocalizedStringKey {
     switch type {
-    case .beastFuel: return "Reach Top 50 in Cola League"
-    case .gingerShock: return "Reach Top 10 in Beast Fuel"
+    case .beastFuel: return "unlock_beast_fuel"
+    case .gingerShock: return "unlock_ginger_shock"
     default: return ""
     }
   }
@@ -751,6 +880,7 @@ struct DrinkCard: View {
     drinkCardContent
       .background(drinkCardOuterBackground)
       .overlay(drinkCardBorder)
+      .clipShape(RoundedRectangle(cornerRadius: 24))  // コンテンツが外枠からはみ出さないようクリッピング
       .shadow(
         color: isSelected ? Color.neonCyan.opacity(0.4) : Color.black.opacity(0.3),
         radius: isSelected ? 15 : 8,
@@ -760,7 +890,6 @@ struct DrinkCard: View {
       .scaleEffect(isPressed ? 0.97 : 1.0)
       .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
       .animation(.easeInOut(duration: 0.3), value: isSelected)
-      .opacity(type.isLocked ? 0.6 : 1.0)
       .overlay(drinkCardLockedOverlay)
       .onLongPressGesture(
         minimumDuration: .infinity, maximumDistance: .infinity,
@@ -777,10 +906,22 @@ struct DrinkCard: View {
 
   private var drinkCardImageSection: some View {
     ZStack(alignment: .topTrailing) {
-      RoundedRectangle(cornerRadius: 20)
+      // cornerRadius を外枠(24)より小さい16に統一し、段階的なネストとして整理
+      RoundedRectangle(cornerRadius: 16)
         .fill(.ultraThinMaterial)
-        .overlay(RoundedRectangle(cornerRadius: 20).fill(type.backgroundColor.opacity(0.1)))
+        .overlay(RoundedRectangle(cornerRadius: 16).fill(type.backgroundColor.opacity(0.1)))
         .frame(height: 190)
+
+      // 選択時のブラーエフェクト（画像の背景にグローを発生させる）
+      if isSelected {
+        Circle()
+          .fill(type.backgroundColor)
+          .frame(width: 130, height: 130)
+          .blur(radius: 30)  // 強くぼかして光っているように見せる
+          .opacity(0.8)
+        // 呼吸するようなアニメーションを与えたい場合はscaleEffectやopacityをアニメーションさせることもできますが、
+        // ここではシンプルに背景グローとして配置します。
+      }
 
       Image(type.imageName)
         .resizable()
@@ -794,7 +935,7 @@ struct DrinkCard: View {
         )
 
       if isSelected {
-        Text("ACTIVE")
+        Text(LocalizedStringKey("active_upper"))
           .font(.system(size: 10, weight: .heavy))
           .foregroundColor(.black)
           .padding(.horizontal, 10)
@@ -812,14 +953,9 @@ struct DrinkCard: View {
   @ViewBuilder
   private var drinkCardInfoSection: some View {
     VStack(alignment: .leading, spacing: 10) {
-      if !type.isLocked {
-        drinkCardRankBestRow
-      } else {
-        // ロック時も高さを確保するためのダミー
-        Text(" ")
-          .font(.system(size: 11, weight: .bold))
-          .opacity(0)
-      }
+      // ロック/非ロック問わずランク行の高さを常に確保して高さを統一
+      drinkCardRankBestRow
+        .opacity(type.isLocked ? 0 : 1)  // ロック時は非表示にするが高さは維持
 
       Text(type.displayName)
         .font(.system(size: 18, weight: .black))
@@ -830,13 +966,18 @@ struct DrinkCard: View {
 
       if type.isLocked {
         drinkCardLockedInfo
+      } else {
+        // アンロック時もロック時のProgressBar分の高さを確保してカード高さを統一
+        Spacer().frame(height: 38)
       }
     }
+    .frame(minHeight: 100)  // カード間の最小高さを統一
     .padding(.horizontal, 16)
     .padding(.top, 14)
     .padding(.bottom, 20)
     .background(
-      RoundedRectangle(cornerRadius: 20)
+      // cornerRadius を外枠(24)より小さい16に統一
+      RoundedRectangle(cornerRadius: 16)
         .fill(Color.black.opacity(0.4))
     )
   }
@@ -845,18 +986,18 @@ struct DrinkCard: View {
     HStack(spacing: 8) {
       Group {
         if let rank = rankNumber {
-          Text("RANK #\(rank)")
+          Text("rank_number \(rank)")
             .foregroundColor(.neonCyan)
         } else {
-          Text("RANK #—")
+          Text(LocalizedStringKey("rank_number_none"))
             .foregroundColor(.white.opacity(0.5))
         }
 
         if let best = bestMeters {
-          Text("BEST \(String(format: "%.1f", best))m")
+          Text("best_meters_format \(String(format: "%.1f", best))")
             .foregroundColor(.white.opacity(0.9))
         } else {
-          Text("BEST —")
+          Text(LocalizedStringKey("best_meters_none"))
             .foregroundColor(.white.opacity(0.5))
         }
       }
@@ -865,14 +1006,19 @@ struct DrinkCard: View {
   }
 
   private var drinkCardLockedInfo: some View {
-    VStack(alignment: .leading, spacing: 6) {
+    VStack(alignment: .leading, spacing: 8) {
       HStack(spacing: 4) {
         Image(systemName: "lock.fill")
           .font(.system(size: 10))
           .foregroundColor(.neonYellow)
-        Text("UNLOCK REQ.")
+        Text(LocalizedStringKey("unlock_req"))
           .font(.system(size: 10, weight: .black))
           .foregroundColor(.neonYellow)
+        Spacer()
+        // 進行率をパーセントで表示
+        Text("\(Int(unlockProgress * 100))%")
+          .font(.system(size: 10, weight: .bold, design: .monospaced))
+          .foregroundColor(.neonYellow.opacity(0.8))
       }
 
       Text(unlockRequirementText)
@@ -881,18 +1027,25 @@ struct DrinkCard: View {
         .lineLimit(1)
         .minimumScaleFactor(0.8)
 
+      // プログレスバー：高さ6px・グラデーション塗りつぶし
       GeometryReader { geo in
         ZStack(alignment: .leading) {
           Capsule()
-            .fill(Color.white.opacity(0.15))
-            .frame(height: 4)
+            .fill(Color.white.opacity(0.1))
+            .frame(height: 6)
           Capsule()
-            .fill(Color.neonYellow.opacity(0.9))
-            .frame(width: geo.size.width * unlockProgress, height: 4)
-            .shadow(color: .neonYellow.opacity(0.5), radius: 4)
+            .fill(
+              LinearGradient(
+                colors: [Color.neonYellow.opacity(0.7), Color.neonYellow],
+                startPoint: .leading,
+                endPoint: .trailing
+              )
+            )
+            .frame(width: geo.size.width * unlockProgress, height: 6)
+            .shadow(color: .neonYellow.opacity(0.6), radius: 5)
         }
       }
-      .frame(height: 4)
+      .frame(height: 6)
     }
   }
 
@@ -923,34 +1076,78 @@ struct DrinkCard: View {
   private var drinkCardLockedOverlay: some View {
     if type.isLocked {
       ZStack {
+        // 缶が薄く透けて見えるグラデーションオーバーレイ（上端は透明、中央〜下に向けて暗める）
         RoundedRectangle(cornerRadius: 24)
-          .fill(.ultraThinMaterial)
-          .opacity(0.8)
+          .fill(
+            LinearGradient(
+              colors: [
+                Color.black.opacity(0.1),
+                Color.black.opacity(0.55),
+                Color.black.opacity(0.75),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          )
 
-        VStack(spacing: 8) {
+        // カード内で中央付近に鍵アイコン＋バッジを配置
+        VStack(spacing: 10) {
+          // パルスアニメーション付きの鍵アイコン
           ZStack {
+            // 外側グロー（大）
             Circle()
-              .fill(Color.black.opacity(0.6))
-              .frame(width: 50, height: 50)
+              .fill(Color.neonYellow.opacity(lockPulse ? 0.15 : 0.05))
+              .frame(width: 70, height: 70)
+              .blur(radius: 8)
+              .animation(
+                .easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: lockPulse)
+
+            // 内側背景
+            Circle()
+              .fill(
+                RadialGradient(
+                  colors: [Color.neonYellow.opacity(0.2), Color.black.opacity(0.7)],
+                  center: .center,
+                  startRadius: 0,
+                  endRadius: 28
+                )
+              )
+              .frame(width: 56, height: 56)
+              .overlay(
+                Circle().stroke(Color.neonYellow.opacity(0.4), lineWidth: 1)
+              )
 
             Image(systemName: "lock.fill")
-              .font(.system(size: 24))
+              .font(.system(size: 26, weight: .bold))
               .foregroundColor(.neonYellow)
-              .shadow(color: .neonYellow.opacity(0.6), radius: 8)
+              .shadow(color: .neonYellow.opacity(lockPulse ? 0.9 : 0.4), radius: lockPulse ? 12 : 6)
+              .animation(
+                .easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: lockPulse)
           }
 
-          Text("LOCKED")
-            .font(.system(size: 12, weight: .heavy))
-            .foregroundColor(.white)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 4)
-            .background(Capsule().fill(Color.black.opacity(0.7)))
-            .overlay(
-              Capsule()
-                .stroke(Color.neonYellow.opacity(0.5), lineWidth: 1)
-            )
+          // LOCKEDバッジ
+          HStack(spacing: 5) {
+            Rectangle()
+              .fill(Color.neonYellow.opacity(0.5))
+              .frame(width: 20, height: 1)
+            Text("LOCKED")
+              .font(.system(size: 11, weight: .heavy, design: .default))
+              .tracking(2)  // 文字間隔を広げてスタイリッシュに
+              .foregroundColor(.neonYellow)
+            Rectangle()
+              .fill(Color.neonYellow.opacity(0.5))
+              .frame(width: 20, height: 1)
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 5)
+          .background(
+            Capsule()
+              .fill(Color.black.opacity(0.6))
+              .overlay(Capsule().stroke(Color.neonYellow.opacity(0.3), lineWidth: 1))
+          )
         }
       }
+      .onAppear { lockPulse = true }
     }
   }
 

@@ -40,7 +40,7 @@ struct SafetyWarningView: View {
 
         Spacer()
 
-        NeonButton(title: NSLocalizedString("got_it", comment: ""), color: .neonCyan, icon: nil) {
+        NeonButton(title: "got_it", color: .neonCyan, icon: nil) {
           viewModel.acknowledgeWarning()
         }
         .padding()
