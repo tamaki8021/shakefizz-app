@@ -26,7 +26,8 @@ class GameViewModel: ObservableObject {
   private let currencyUserDefaultsKey = "shakefizz_currency"
 
   init() {
-    fizzRemaining = min(maxFizz, UserDefaults.standard.object(forKey: fizzUserDefaultsKey) as? Int ?? maxFizz)
+    fizzRemaining = min(
+      maxFizz, UserDefaults.standard.object(forKey: fizzUserDefaultsKey) as? Int ?? maxFizz)
     currency = UserDefaults.standard.object(forKey: currencyUserDefaultsKey) as? Int ?? 2450
   }
 
@@ -154,6 +155,30 @@ class GameViewModel: ObservableObject {
     let currentBest = UserDefaults.standard.double(forKey: "bestScore")
     let isPersonalBest = score > currentBest
 
+    // 自己ベスト更新時のみランキングを更新（それ以外は順位キープ）
+    let simulatedRank: Int
+    let simulatedDelta: Int?
+
+    if isPersonalBest {
+      // 新しいベストスコアでランクを計算
+      simulatedRank = max(1, Int(10000.0 / pow(max(1.0, score * 0.1), 1.5)))
+
+      if currentBest > 0 {
+        // 過去のベストからの上がり幅を計算
+        let oldRank = max(1, Int(10000.0 / pow(max(1.0, currentBest * 0.1), 1.5)))
+        let improved = oldRank - simulatedRank
+        simulatedDelta = improved > 0 ? improved : nil
+      } else {
+        // 初回プレイ時は順位変動を見せない
+        simulatedDelta = nil
+      }
+    } else {
+      // 自己ベストではない場合、過去のベスト基準の順位を表示し、変動はなし
+      simulatedRank =
+        currentBest > 0 ? max(1, Int(10000.0 / pow(max(1.0, currentBest * 0.1), 1.5))) : 10000
+      simulatedDelta = nil
+    }
+
     let session = Session(
       score: score,
       drinkType: drink,
@@ -161,7 +186,9 @@ class GameViewModel: ObservableObject {
       totalShakes: totalShakes,
       duration: 15.0 - gameTimeRemaining,
       timestamp: Date(),
-      isPersonalBest: isPersonalBest
+      isPersonalBest: isPersonalBest,
+      rankNumber: simulatedRank,
+      rankDelta: simulatedDelta
     )
 
     self.currentSession = session
@@ -183,7 +210,7 @@ class GameViewModel: ObservableObject {
 
       let formatter = RelativeDateTimeFormatter()
       formatter.unitsStyle = .abbreviated
-      UserDefaults.standard.set("just now", forKey: "bestDate")
+      UserDefaults.standard.set(NSLocalizedString("just_now", comment: ""), forKey: "bestDate")
     }
   }
 
@@ -206,14 +233,36 @@ class GameViewModel: ObservableObject {
     gameState = .selection
   }
 
-  func retryGame() {
-    // Keep same drink, go back to warning? Or straight to play?
-    // Usually safety warning is "once per session" but readme says "Required step before play".
-    // Let's go to warning to be safe.
+  func retryGame(fromZero: Bool = false) {
     gameTimer?.cancel()
     gameTimer = nil
     shakeManager.reset()
     currentSession = nil
+
+    if fromZero {
+      // 炭酸を未消費扱いにする（1つ回復）
+      refillFizz(amount: 1)
+
+      // 再度消費して、Warningをスキップし直接プレイ開始
+      if consumeFizzIfAvailable() {
+        gameState = .playing
+        isTimeUp = false
+        gameTimeRemaining = 15.0
+        if let drink = selectedDrink {
+          shakeManager.fizzModifier = Double(drink.fizzPercent) / 100.0
+        }
+        startCountdown()
+        return
+      }
+    }
+
+    // 残機がない場合は、強制的にドリンク選択画面（ホーム）に戻る
+    guard fizzRemaining > 0 else {
+      gameState = .selection
+      return
+    }
+
+    // 通常のリトライ
     gameState = .safetyWarning
   }
 }
