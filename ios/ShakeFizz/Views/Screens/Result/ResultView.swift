@@ -34,26 +34,7 @@ struct ResultView: View {
 
   // MARK: - Helpers
 
-  private func leagueInfo(for drinkType: DrinkType) -> (icon: String, color: Color, name: String) {
-    let icon: String
-    let name: String
-    switch drinkType {
-    case .ultraCola:
-      icon = "crown.fill"
-      name = NSLocalizedString("league_ultra_cola", comment: "")
-    case .limeBurst:
-      icon = "leaf.fill"
-      name = NSLocalizedString("league_lime_burst", comment: "")
-    case .beastFuel:
-      icon = "bolt.fill"
-      name = NSLocalizedString("league_beast_fuel", comment: "")
-    case .gingerShock:
-      icon = "flame.fill"
-      name = NSLocalizedString("league_ginger_shock", comment: "")
-    }
-    // カラーは視認性の高い accentColor を使用
-    return (icon, drinkType.accentColor, name)
-  }
+
 
   /// スコアに応じた泡パーティクル量を返す
   private func fizzParticleCount(score: Double) -> Int {
@@ -167,7 +148,7 @@ struct ResultView: View {
       if showFizzColumn, let session = viewModel.currentSession, session.score > 0 {
         FizzColumnView(
           score: session.score,
-          color: leagueInfo(for: session.drinkType).color,
+          color: session.drinkType.accentColor,
           particleCount: fizzParticleCount(score: session.score)
         )
         .ignoresSafeArea()
@@ -215,14 +196,14 @@ struct ResultView: View {
                         .foregroundColor(.white)
                         .shadow(
                           color: showScoreGlow
-                            ? leagueInfo(for: session.drinkType).color.opacity(0.9) : .clear,
+                            ? session.drinkType.accentColor.opacity(0.9) : .clear,
                           radius: 24
                         )
                         .animation(.easeOut(duration: 0.4), value: showScoreGlow)
 
                       Text(LocalizedStringKey("meters_label"))
                         .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundColor(leagueInfo(for: session.drinkType).color)
+                        .foregroundColor(session.drinkType.accentColor)
                     }
 
                     // リアル比較コピー
@@ -263,18 +244,17 @@ struct ResultView: View {
 
                   // リーグバッジ（リッチ化・枠線排除）
                   if session.rankNumber != nil {
-                    let league = leagueInfo(for: session.drinkType)
-                    let baseColor = league.color  // leagueInfo は既に accentColor を返すよう修正済み
+                    let baseColor = session.drinkType.accentColor
 
                     Button(action: { showRankingSheet = true }) {
                       HStack(spacing: 10) {
-                        Image(systemName: league.icon)
+                        Image(systemName: session.drinkType.leagueIcon)
                           .font(.system(size: 16, weight: .bold))
                           .foregroundColor(baseColor)
                           .shadow(color: baseColor.opacity(0.6), radius: 4)
 
                         VStack(alignment: .leading, spacing: 2) {
-                          Text(league.name)
+                          Text(session.drinkType.leagueName)
                             .font(.system(size: 11, weight: .black, design: .rounded))
                             .foregroundColor(baseColor)
 
