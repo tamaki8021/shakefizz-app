@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "a_high_end_3d_product_render_of_a_sleek_aluminum_soda_can_for_tropical_blast_flavor._the_can_is_a_bright_sunny_yellow_with_vibrant_teal_and_coral_accents._the_name_tropical_blast_is_featured_prominent.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

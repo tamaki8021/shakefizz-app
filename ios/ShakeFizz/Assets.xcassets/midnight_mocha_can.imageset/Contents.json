@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "a_high_end_3d_product_render_of_a_sleek_aluminum_soda_can_for_midnight_mocha_flavor._the_can_is_a_sophisticated_deep_bronze_and_matte_black_suggesting_a_rich_coffee_energy_kick._the_name_midnight_moch.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
