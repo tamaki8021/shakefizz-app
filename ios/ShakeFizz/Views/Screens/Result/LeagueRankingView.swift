@@ -11,27 +11,37 @@ struct LeaguePlayer: Identifiable {
 
 // League Types for Navigation
 enum LeagueType: String, CaseIterable, Identifiable {
-  case bronze = "Bronze League"
-  case silver = "Silver League"
-  case gold = "Gold League"
+  case ultraCola = "ultra_cola"
+  case limeBurst = "lime_burst"
+  case beastFuel = "beast_fuel"
+  case gingerShock = "ginger_shock"
   case global = "Global Rank"
-  
+
   var id: String { self.rawValue }
-  
-  var icon: String {
+
+  var displayName: String {
     switch self {
-    case .bronze: return "medal.fill"
-    case .silver: return "shield.fill"
-    case .gold: return "crown.fill"
-    case .global: return "globe.americas.fill"
+    case .ultraCola: return "Ultra Cola League"
+    case .limeBurst: return "Lime Burst League"
+    case .beastFuel: return "Beast Fuel League"
+    case .gingerShock: return "Ginger Shock League"
+    case .global: return "Global Rank"
     }
   }
-  
+
+  var icon: String {
+    switch self {
+    case .global: return "globe.americas.fill"
+    default: return "sparkles"
+    }
+  }
+
   var color: Color {
     switch self {
-    case .bronze: return Color(red: 0.8, green: 0.5, blue: 0.2) // Bronze
-    case .silver: return .gray
-    case .gold: return .yellow
+    case .ultraCola: return Color(red: 0.95, green: 0.10, blue: 0.15)
+    case .limeBurst: return Color(red: 0.28, green: 0.95, blue: 0.28)
+    case .beastFuel: return Color(red: 0.08, green: 0.62, blue: 0.96)
+    case .gingerShock: return Color(red: 0.98, green: 0.85, blue: 0.15)
     case .global: return .neonCyan
     }
   }
@@ -42,7 +52,7 @@ struct LeagueRankingView: View {
   let currentRank: Int
   let currentScore: Double
   
-  @State private var selectedLeague: LeagueType = .silver
+  @State private var selectedLeague: LeagueType = .ultraCola
 
   // Mock Data generation (centered around current player and top 3)
   private func rankingData(for league: LeagueType) -> [LeaguePlayer] {
@@ -51,13 +61,14 @@ struct LeagueRankingView: View {
     // Create base score modifier depending on league
     let scoreModifier: Double
     switch league {
-    case .bronze: scoreModifier = 0.6
-    case .silver: scoreModifier = 1.0
-    case .gold: scoreModifier = 1.8
-    case .global: scoreModifier = 2.5
+    case .ultraCola: scoreModifier = 0.85
+    case .limeBurst: scoreModifier = 0.70
+    case .beastFuel: scoreModifier = 0.95
+    case .gingerShock: scoreModifier = 0.95
+    case .global: scoreModifier = 1.0
     }
-    
-    let isUserLeague = (league == .silver) // MVP: User is always in silver
+
+    let isUserLeague = (league == .ultraCola) // MVP: User is always in Ultra Cola league by default
     let targetRank = isUserLeague ? currentRank : Int.random(in: 100...500)
     let targetScore = currentScore * scoreModifier
 
@@ -158,7 +169,7 @@ struct LeagueRankingView: View {
               
               Image(systemName: selectedLeague.icon)
                 .foregroundColor(selectedLeague.color)
-              Text(selectedLeague.rawValue)
+              Text(selectedLeague.displayName)
                 .font(.system(size: 18, weight: .black))
                 .foregroundColor(.white)
                 .id(selectedLeague)
