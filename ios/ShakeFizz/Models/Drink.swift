@@ -38,7 +38,7 @@ enum DrinkType: String, Codable, CaseIterable, Identifiable {
 
   var isLocked: Bool {
     switch self {
-    case .gingerShock: return true
+    case .beastFuel: return true
     default: return false
     }
   }
@@ -46,15 +46,26 @@ enum DrinkType: String, Codable, CaseIterable, Identifiable {
   var backgroundColor: Color {
     switch self {
     case .ultraCola:
-      return Color(red: 0.18, green: 0.09, blue: 0.06)  // Dark brown #2D1810
+      return Color(red: 0.071, green: 0.008, blue: 0.027)  // Near Black Cola #120207
     case .limeBurst:
       return Color(red: 0.20, green: 0.80, blue: 0.20)  // Lime green #32CD32
     case .beastFuel:
       return Color(red: 0.04, green: 0.09, blue: 0.16)  // Deep blue #0A1628
     case .gingerShock:
-      return Color(red: 0.55, green: 0.27, blue: 0.07)  // Saddle brown #8B4513
+      return Color(red: 0.75, green: 0.45, blue: 0.10)  // Golden Amber #BF731A
     }
   }
+
+  /// UIアクセント用の鮮やかなカラー（スコアグロー、炭酸カラム、バッジ等で使用）
+  var accentColor: Color {
+    switch self {
+    case .ultraCola: return Color(red: 0.95, green: 0.10, blue: 0.15)  // コーラ・レッド �
+    case .limeBurst: return Color(red: 0.28, green: 0.95, blue: 0.28)  // ライム・グリーン 🟢
+    case .beastFuel: return Color(red: 0.08, green: 0.62, blue: 0.96)  // エレクトリック・ブルー 🔵
+    case .gingerShock: return Color(red: 0.98, green: 0.85, blue: 0.15)  // ジンジャー・ゴールド �
+    }
+  }
+
 }
 
 struct Drink: Identifiable {
