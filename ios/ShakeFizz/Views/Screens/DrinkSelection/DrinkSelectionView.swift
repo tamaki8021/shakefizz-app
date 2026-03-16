@@ -188,7 +188,7 @@ struct DrinkSelectionView: View {
         startPoint: .top,
         endPoint: .bottom
       )
-      .frame(height: 30)  // 高さを減らす
+      .frame(height: 20)  // 高さをさらに減らす (30 -> 20)
       bottomButtonStack
     }
   }
@@ -204,7 +204,7 @@ struct DrinkSelectionView: View {
       }
       startShakingButton
     }
-    .padding(.top, 4)  // 上部パディングを減らす
+    .padding(.top, 0)  // 上部パディングをさらに減らす (4 -> 0)
     .background(Color.black.opacity(0.95))
   }
 
@@ -238,7 +238,7 @@ struct DrinkSelectionView: View {
     .disabled(viewModel.selectedDrink == nil)
     .opacity(canStart ? 1.0 : 0.5)
     .padding(.horizontal, 24)
-    .padding(.bottom, 16)  // 下部パディングを大幅に減らす (26 -> 34 -> 16くらいに調整)
+    .padding(.bottom, 8)  // 下部パディングをさらに減らす (16 -> 8)
   }
 }
 
@@ -860,21 +860,6 @@ struct DrinkCard: View {
   @State private var isPressed = false
   @State private var lockPulse = false
 
-  private var unlockRequirementText: LocalizedStringKey {
-    switch type {
-    case .beastFuel: return "unlock_beast_fuel"
-    case .gingerShock: return "unlock_ginger_shock"
-    default: return ""
-    }
-  }
-
-  private var unlockProgress: Double {
-    switch type {
-    case .beastFuel: return 0.64
-    case .gingerShock: return 0.2
-    default: return 0
-    }
-  }
 
   var body: some View {
     drinkCardContent
@@ -910,7 +895,7 @@ struct DrinkCard: View {
       RoundedRectangle(cornerRadius: 16)
         .fill(.ultraThinMaterial)
         .overlay(RoundedRectangle(cornerRadius: 16).fill(type.backgroundColor.opacity(0.1)))
-        .frame(height: 190)
+        .frame(height: 180)
 
       // 選択時のブラーエフェクト（画像の背景にグローを発生させる）
       if isSelected {
@@ -926,7 +911,7 @@ struct DrinkCard: View {
       Image(type.imageName)
         .resizable()
         .scaledToFit()
-        .frame(height: 170)
+        .frame(height: 160)
         .shadow(
           color: isSelected ? type.backgroundColor.opacity(0.6) : .black.opacity(0.3),
           radius: isSelected ? 24 : 12,
@@ -964,18 +949,11 @@ struct DrinkCard: View {
         .lineLimit(1)
         .minimumScaleFactor(0.8)
 
-      if type.isLocked {
-        drinkCardLockedInfo
-      } else {
-        // アンロック時もロック時のProgressBar分の高さを確保してカード高さを統一
-        Spacer().frame(height: 38)
-      }
     }
-    .frame(minHeight: 100)  // カード間の最小高さを統一
+    .frame(minHeight: 60)  // カード間の最小高さを統一
     .padding(.horizontal, 16)
-    .padding(.top, 14)
-    .padding(.bottom, 20)
-    .background(
+    .padding(.top, 12)
+    .padding(.bottom, 16)    .background(
       // cornerRadius を外枠(24)より小さい16に統一
       RoundedRectangle(cornerRadius: 16)
         .fill(Color.black.opacity(0.4))
@@ -1005,49 +983,6 @@ struct DrinkCard: View {
     }
   }
 
-  private var drinkCardLockedInfo: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(spacing: 4) {
-        Image(systemName: "lock.fill")
-          .font(.system(size: 10))
-          .foregroundColor(.neonYellow)
-        Text(LocalizedStringKey("unlock_req"))
-          .font(.system(size: 10, weight: .black))
-          .foregroundColor(.neonYellow)
-        Spacer()
-        // 進行率をパーセントで表示
-        Text("\(Int(unlockProgress * 100))%")
-          .font(.system(size: 10, weight: .bold, design: .monospaced))
-          .foregroundColor(.neonYellow.opacity(0.8))
-      }
-
-      Text(unlockRequirementText)
-        .font(.system(size: 10, weight: .semibold))
-        .foregroundColor(.white.opacity(0.7))
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
-
-      // プログレスバー：高さ6px・グラデーション塗りつぶし
-      GeometryReader { geo in
-        ZStack(alignment: .leading) {
-          Capsule()
-            .fill(Color.white.opacity(0.1))
-            .frame(height: 6)
-          Capsule()
-            .fill(
-              LinearGradient(
-                colors: [Color.neonYellow.opacity(0.7), Color.neonYellow],
-                startPoint: .leading,
-                endPoint: .trailing
-              )
-            )
-            .frame(width: geo.size.width * unlockProgress, height: 6)
-            .shadow(color: .neonYellow.opacity(0.6), radius: 5)
-        }
-      }
-      .frame(height: 6)
-    }
-  }
 
   private var drinkCardOuterBackground: some View {
     RoundedRectangle(cornerRadius: 24)
