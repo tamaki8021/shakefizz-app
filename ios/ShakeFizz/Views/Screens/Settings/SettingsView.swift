@@ -4,6 +4,7 @@ struct SettingsView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var settingsManager: SettingsManager
   @Environment(\.dismiss) var dismiss
+  @State private var showHelp = false
 
   var body: some View {
     ZStack {
@@ -49,13 +50,16 @@ struct SettingsView: View {
             // Profile Section
             NewProfileSection()
 
+            // General Section
+            GeneralSection(showHelp: $showHelp)
+              .environmentObject(languageManager)
+
             // Immersion Section
             ImmersionSection()
               .environmentObject(settingsManager)
 
-            // Accessibility Section
-            AccessibilitySection()
-              .environmentObject(settingsManager)
+            // About Section
+            AboutSection()
 
             // Footer
             FooterSection()
@@ -67,85 +71,286 @@ struct SettingsView: View {
         }
       }
     }
+    .sheet(isPresented: $showHelp) {
+      HelpSheetView()
+    }
   }
 }
 
 // MARK: - New Profile Section
 struct NewProfileSection: View {
   var body: some View {
-    HStack(spacing: 16) {
-      // Profile Image with Rainbow Border
-      ZStack(alignment: .bottomLeading) {
-        Circle()
-          .strokeBorder(
-            AngularGradient(
-              gradient: Gradient(colors: [
-                .red, .orange, .yellow, .green, .cyan, .blue, .purple, .red,
-              ]),
-              center: .center
-            ),
-            lineWidth: 3
-          )
-          .frame(width: 70, height: 70)
-          .background(
-            Circle()
-              .fill(Color.black.opacity(0.5))
-          )
+    Button(action: {
+      // TODO: Edit profile action
+    }) {
+      HStack(spacing: 16) {
+        // Profile Image with Rainbow Border
+        ZStack(alignment: .bottomLeading) {
+          Circle()
+            .strokeBorder(
+              AngularGradient(
+                gradient: Gradient(colors: [
+                  .red, .orange, .yellow, .green, .cyan, .blue, .purple, .red,
+                ]),
+                center: .center
+              ),
+              lineWidth: 3
+            )
+            .frame(width: 70, height: 70)
+            .background(
+              Circle()
+                .fill(Color.black.opacity(0.5))
+            )
+            .overlay(
+              Image("can_ultra_cola")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 50, height: 50)
+            )
+
+          // PRO Badge
+          Text("PRO")
+            .font(.system(size: 10, weight: .black))
+            .foregroundColor(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+              Capsule()
+                .fill(Color.neonMagenta)
+            )
+            .offset(x: -4, y: 4)
+        }
+
+        // User Info
+        VStack(alignment: .leading, spacing: 4) {
+          Text(LocalizedStringKey("fizz_master"))
+            .font(.system(size: 18, weight: .bold))
+            .foregroundColor(.white)
+        }
+
+        Spacer()
+
+        // Visual Indicator
+        Image(systemName: "chevron.right")
+          .font(.system(size: 14, weight: .bold))
+          .foregroundColor(.white.opacity(0.3))
+      }
+      .padding(16)
+      .background(
+        RoundedRectangle(cornerRadius: 16)
+          .fill(Color.black.opacity(0.4))
           .overlay(
-            Image("can_ultra_cola")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 50, height: 50)
+            RoundedRectangle(cornerRadius: 16)
+              .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
           )
+      )
+    }
+    .buttonStyle(TappableCardStyle())
+  }
+}
 
-        // PRO Badge
-        Text("PRO")
-          .font(.system(size: 10, weight: .black))
-          .foregroundColor(.white)
-          .padding(.horizontal, 8)
-          .padding(.vertical, 4)
-          .background(
-            Capsule()
-              .fill(Color.neonMagenta)
-          )
-          .offset(x: -4, y: 4)
+// MARK: - General Section
+struct GeneralSection: View {
+  @EnvironmentObject var languageManager: LanguageManager
+  @Binding var showHelp: Bool
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      // Section Title
+      Text(LocalizedStringKey("general"))
+        .font(.system(size: 12, weight: .bold))
+        .foregroundColor(.white)
+        .tracking(1.5)
+
+      VStack(spacing: 0) {
+        // Language
+        SettingLanguageRow(
+          icon: "globe",
+          iconColor: .gray,
+          title: "language"
+        )
+
+        Divider()
+          .background(Color.white.opacity(0.1))
+          .padding(.leading, 52)
+
+        // How to Play
+        Button(action: { showHelp = true }) {
+          HStack(spacing: 12) {
+            Image(systemName: "questionmark.circle.fill")
+              .font(.system(size: 20))
+              .foregroundColor(.gray)
+              .frame(width: 24)
+
+            Text(LocalizedStringKey("how_to_play_title"))
+              .font(.system(size: 15, weight: .semibold))
+              .foregroundColor(.white)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+              .font(.system(size: 14, weight: .bold))
+              .foregroundColor(.white.opacity(0.3))
+          }
+          .padding(.horizontal, 16)
+          .padding(.vertical, 14)
+        }
       }
+      .background(
+        RoundedRectangle(cornerRadius: 12)
+          .fill(Color.black.opacity(0.4))
+      )
+    }
+  }
+}
 
-      // User Info
-      VStack(alignment: .leading, spacing: 4) {
-        Text(LocalizedStringKey("fizz_master"))
-          .font(.system(size: 18, weight: .bold))
-          .foregroundColor(.white)
+// MARK: - Setting Language Row
+struct SettingLanguageRow: View {
+  @EnvironmentObject var languageManager: LanguageManager
+  let icon: String
+  let iconColor: Color
+  let title: String
 
-        Text("Level 42 • Rank #156")
-          .font(.system(size: 13))
-          .foregroundColor(.gray)
-      }
+  var body: some View {
+    HStack(spacing: 12) {
+      Image(systemName: icon)
+        .font(.system(size: 20))
+        .foregroundColor(iconColor)
+        .frame(width: 24)
+
+      Text(LocalizedStringKey(title))
+        .font(.system(size: 15, weight: .semibold))
+        .foregroundColor(.white)
 
       Spacer()
 
-      // Edit Profile Button
-      Button(action: {
-        // TODO: Edit profile
-      }) {
-        HStack(spacing: 4) {
-          Text(LocalizedStringKey("edit_profile"))
-            .font(.system(size: 13, weight: .semibold))
-          Image(systemName: "pencil")
-            .font(.system(size: 11))
+      Menu {
+        Button(action: { languageManager.setLanguage("en") }) {
+          HStack {
+            Text(LocalizedStringKey("english"))
+            if languageManager.locale.identifier.starts(with: "en") {
+              Image(systemName: "checkmark")
+            }
+          }
         }
-        .foregroundColor(.neonCyan)
+        Button(action: { languageManager.setLanguage("ja") }) {
+          HStack {
+            Text(LocalizedStringKey("japanese"))
+            if languageManager.locale.identifier.starts(with: "ja") {
+              Image(systemName: "checkmark")
+            }
+          }
+        }
+      } label: {
+        HStack(spacing: 4) {
+          Text(languageManager.locale.identifier.starts(with: "ja") ? LocalizedStringKey("japanese") : LocalizedStringKey("english"))
+            .font(.system(size: 14))
+            .foregroundColor(.gray)
+          Image(systemName: "chevron.up.chevron.down")
+            .font(.system(size: 12))
+            .foregroundColor(.gray)
+        }
       }
     }
-    .padding(16)
-    .background(
-      RoundedRectangle(cornerRadius: 16)
-        .fill(Color.black.opacity(0.4))
-        .overlay(
-          RoundedRectangle(cornerRadius: 16)
-            .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-        )
-    )
+    .padding(.horizontal, 16)
+    .padding(.vertical, 14)
+  }
+}
+
+// MARK: - About Section
+struct AboutSection: View {
+  let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      // Section Title
+      Text(LocalizedStringKey("about_title"))
+        .font(.system(size: 12, weight: .bold))
+        .foregroundColor(.white)
+        .tracking(1.5)
+
+      VStack(spacing: 0) {
+        // Version
+        HStack(spacing: 12) {
+          Image(systemName: "info.circle")
+            .font(.system(size: 20))
+            .foregroundColor(.gray)
+            .frame(width: 24)
+          Text(LocalizedStringKey("version"))
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundColor(.white)
+          Spacer()
+          Text(appVersion)
+            .font(.system(size: 14))
+            .foregroundColor(.gray)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+
+        Divider()
+          .background(Color.white.opacity(0.1))
+          .padding(.leading, 52)
+
+        // Credits
+        HStack(spacing: 12) {
+          Image(systemName: "person.2.fill")
+            .font(.system(size: 18))
+            .foregroundColor(.gray)
+            .frame(width: 24)
+          Text(LocalizedStringKey("credits"))
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundColor(.white)
+          Spacer()
+          Text(LocalizedStringKey("developer_team"))
+            .font(.system(size: 14))
+            .foregroundColor(.gray)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+
+        Divider()
+          .background(Color.white.opacity(0.1))
+          .padding(.leading, 52)
+
+        // Rate App
+        Button(action: {
+          // TODO: Open App Store review page
+          // if let url = URL(string: "itms-apps://itunes.apple.com/app/idYOUR_APP_ID?action=write-review") {
+          //   UIApplication.shared.open(url)
+          // }
+        }) {
+          HStack(spacing: 12) {
+            Image(systemName: "star.fill")
+              .font(.system(size: 20))
+              .foregroundColor(.yellow)
+              .frame(width: 24)
+            Text(LocalizedStringKey("rate_app"))
+              .font(.system(size: 15, weight: .semibold))
+              .foregroundColor(.white)
+            Spacer()
+            Image(systemName: "arrow.up.right")
+              .font(.system(size: 12))
+              .foregroundColor(.gray)
+          }
+          .padding(.horizontal, 16)
+          .padding(.vertical, 14)
+        }
+      }
+      .background(
+        RoundedRectangle(cornerRadius: 12)
+          .fill(Color.black.opacity(0.4))
+      )
+    }
+  }
+}
+
+// タップ時に不透明度を変えるシンプルなスタイル
+struct TappableCardStyle: ButtonStyle {
+  func makeBody(configuration: Configuration) -> some View {
+    configuration.label
+      .opacity(configuration.isPressed ? 0.7 : 1.0)
+      .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+      .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
   }
 }
 
@@ -195,49 +400,6 @@ struct ImmersionSection: View {
           title: "haptic_feedback",
           description: "haptic_feedback_desc",
           isOn: $settingsManager.hapticFeedbackEnabled
-        )
-      }
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(Color.black.opacity(0.4))
-      )
-    }
-  }
-}
-
-// MARK: - Accessibility Section
-struct AccessibilitySection: View {
-  @EnvironmentObject var settingsManager: SettingsManager
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
-      // Section Title
-      Text(LocalizedStringKey("accessibility"))
-        .font(.system(size: 12, weight: .bold))
-        .foregroundColor(.white)
-        .tracking(1.5)
-
-      VStack(spacing: 0) {
-        // Reduce Motion
-        SettingToggleRow(
-          icon: "eye.fill",
-          iconColor: .gray,
-          title: "reduce_motion",
-          description: nil,
-          isOn: $settingsManager.reduceMotionEnabled
-        )
-
-        Divider()
-          .background(Color.white.opacity(0.1))
-          .padding(.leading, 52)
-
-        // High Contrast
-        SettingToggleRow(
-          icon: "circle.lefthalf.filled",
-          iconColor: .gray,
-          title: "high_contrast",
-          description: nil,
-          isOn: $settingsManager.highContrastEnabled
         )
       }
       .background(
