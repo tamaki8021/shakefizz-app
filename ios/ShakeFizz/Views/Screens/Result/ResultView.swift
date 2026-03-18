@@ -34,8 +34,6 @@ struct ResultView: View {
 
   // MARK: - Helpers
 
-
-
   /// スコアに応じた泡パーティクル量を返す
   private func fizzParticleCount(score: Double) -> Int {
     switch score {
@@ -49,52 +47,50 @@ struct ResultView: View {
   private func realWorldComparison(meters: Double) -> String {
     switch meters {
     // 伝説・規格外ゾーン (2000m ~ 100,000m+)
-    case 100000.0...: return NSLocalizedString("comp_100000", comment: "")
-    case 30000.0..<100000.0: return NSLocalizedString("comp_30000", comment: "")
-    case 10000.0..<30000.0: return NSLocalizedString("comp_10000", comment: "")
-    case 3776.0..<10000.0: return NSLocalizedString("comp_3776", comment: "")
-    case 2000.0..<3776.0: return NSLocalizedString("comp_2000", comment: "")
+    case 100000.0...: return "comp_100000"
+    case 30000.0..<100000.0: return "comp_30000"
+    case 10000.0..<30000.0: return "comp_10000"
+    case 3776.0..<10000.0: return "comp_3776"
+    case 2000.0..<3776.0: return "comp_2000"
 
     // 上級・ランドマークゾーン (50m ~ 1000m)
-    case 1000.0..<2000.0: return NSLocalizedString("comp_1000", comment: "")
-    case 630.0..<1000.0: return NSLocalizedString("comp_630", comment: "")
-    case 500.0..<630.0: return NSLocalizedString("comp_500", comment: "")
-    case 333.0..<500.0: return NSLocalizedString("comp_333", comment: "")
-    case 300.0..<333.0: return NSLocalizedString("comp_300", comment: "")
-    case 200.0..<300.0: return NSLocalizedString("comp_200", comment: "")
-    case 150.0..<200.0: return NSLocalizedString("comp_150", comment: "")
-    case 100.0..<150.0: return NSLocalizedString("comp_100", comment: "")
-    case 80.0..<100.0: return NSLocalizedString("comp_80", comment: "")
-    case 50.0..<80.0: return NSLocalizedString("comp_50", comment: "")
+    case 1000.0..<2000.0: return "comp_1000"
+    case 630.0..<1000.0: return "comp_630"
+    case 500.0..<630.0: return "comp_500"
+    case 333.0..<500.0: return "comp_333"
+    case 300.0..<333.0: return "comp_300"
+    case 200.0..<300.0: return "comp_200"
+    case 150.0..<200.0: return "comp_150"
+    case 100.0..<150.0: return "comp_100"
+    case 80.0..<100.0: return "comp_80"
+    case 50.0..<80.0: return "comp_50"
 
     // 中級・街中ゾーン (5m ~ 30m)
-    case 30.0..<50.0: return NSLocalizedString("comp_30", comment: "")
-    case 20.0..<30.0: return NSLocalizedString("comp_20", comment: "")
-    case 15.0..<20.0: return NSLocalizedString("comp_15", comment: "")
-    case 10.0..<15.0: return NSLocalizedString("comp_10", comment: "")
-    case 7.0..<10.0: return NSLocalizedString("comp_7", comment: "")
-    case 5.0..<7.0: return NSLocalizedString("comp_5", comment: "")
+    case 30.0..<50.0: return "comp_30"
+    case 20.0..<30.0: return "comp_20"
+    case 15.0..<20.0: return "comp_15"
+    case 10.0..<15.0: return "comp_10"
+    case 7.0..<10.0: return "comp_7"
+    case 5.0..<7.0: return "comp_5"
 
     // 初心者・日常ゾーン (0m ~ 3m)
-    case 3.0..<5.0: return NSLocalizedString("comp_3", comment: "")
-    case 2.0..<3.0: return NSLocalizedString("comp_2", comment: "")
-    case 1.5..<2.0: return NSLocalizedString("comp_1_5", comment: "")
-    case 1.0..<1.5: return NSLocalizedString("comp_1", comment: "")
-    case 0.8..<1.0: return NSLocalizedString("comp_0_8", comment: "")
-    case 0.5..<0.8: return NSLocalizedString("comp_0_5", comment: "")
-    case 0.3..<0.5: return NSLocalizedString("comp_0_3", comment: "")
-    case 0.1..<0.3: return NSLocalizedString("comp_0_1", comment: "")
-    default: return NSLocalizedString("comp_0", comment: "")
+    case 3.0..<5.0: return "comp_3"
+    case 2.0..<3.0: return "comp_2"
+    case 1.5..<2.0: return "comp_1_5"
+    case 1.0..<1.5: return "comp_1"
+    case 0.8..<1.0: return "comp_0_8"
+    case 0.5..<0.8: return "comp_0_5"
+    case 0.3..<0.5: return "comp_0_3"
+    case 0.1..<0.3: return "comp_0_1"
+    default: return "comp_0"
     }
   }
 
   private func shareText(session: Session) -> String {
-    let rank = Rank.calculate(meters: session.score)
-    return String(
-      format: NSLocalizedString("share_result_text", comment: ""),
-      rank.rawValue,
-      session.score
-    )
+    let baseText = String(format: NSLocalizedString("share_result_text", comment: ""), session.score)
+    let comparisonKey = realWorldComparison(meters: session.score)
+    let localizedComparison = NSLocalizedString(comparisonKey, comment: "")
+    return "\(baseText)\n\(localizedComparison)\n#ShakeFizz"
   }
 
   private func animateScore(to target: Double) {
@@ -181,7 +177,7 @@ struct ResultView: View {
                 VStack(spacing: 8) {
                   if session.score <= 0.0 {
                     VStack(spacing: 6) {
-                      Text("—")
+                      Text(LocalizedStringKey("dash_symbol"))
                         .font(.system(size: 96, weight: .black))
                         .foregroundColor(.gray)
                       Text(LocalizedStringKey("try_harder"))
@@ -207,7 +203,7 @@ struct ResultView: View {
                     }
 
                     // リアル比較コピー
-                    Text(realWorldComparison(meters: session.score))
+                    Text(LocalizedStringKey(realWorldComparison(meters: session.score)))
                       .font(.system(size: 16, weight: .heavy, design: .rounded))
                       .foregroundColor(.white.opacity(0.75))
                       .padding(.top, 2)
@@ -298,20 +294,20 @@ struct ResultView: View {
                   let topSpeedDisplay =
                     session.topSpeed > 0
                     ? String(format: "%.0f", session.topSpeed * 3.6)
-                    : "—"
+                    : String(localized: "dash_symbol")
 
                   let baseColor = session.drinkType.accentColor  // 視認性の高いアクセントカラーを使用
 
                   ResultStatCard(
-                    title: NSLocalizedString("top_speed", comment: ""),
+                    title: "top_speed",
                     value: topSpeedDisplay,
-                    unit: NSLocalizedString("km_h", comment: ""),
+                    unit: "km_h",
                     icon: "bolt.fill",
                     color: baseColor)
                   ResultStatCard(
-                    title: NSLocalizedString("total_shakes", comment: ""),
+                    title: "total_shakes",
                     value: "\(session.totalShakes)",
-                    unit: NSLocalizedString("times", comment: ""),
+                    unit: "times",
                     icon: "drop.fill",
                     color: baseColor)
                 }
@@ -330,7 +326,7 @@ struct ResultView: View {
                 // TRY AGAIN（固定カラー .neonCyan）
                 if viewModel.fizzRemaining > 0 {
                   NeonButton(
-                    title: "try_again",
+                    title: LocalizedStringKey("try_again"),
                     color: .neonCyan,
                     icon: "arrow.clockwise"
                   ) {
@@ -355,7 +351,7 @@ struct ResultView: View {
                     HStack(spacing: 8) {
                       Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 16, weight: .bold))
-                      Text(LocalizedStringKey("share"))
+                      Text("share")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                     }
                     .frame(maxWidth: .infinity)
@@ -467,9 +463,9 @@ struct ResultView: View {
 // MARK: - ResultStatCard
 
 struct ResultStatCard: View {
-  let title: String
+  let title: LocalizedStringKey
   let value: String
-  let unit: String
+  let unit: LocalizedStringKey
   let icon: String
   let color: Color
 
