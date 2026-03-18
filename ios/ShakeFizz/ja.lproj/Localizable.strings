@@ -170,8 +170,8 @@
 "just_now" = "さっき";
 
 // リザルト画面 - 感情爆発リデザイン（30段階スケール）
-"share" = "SHARE YOUR SCORE";
-"share_result_text" = "ShakeFizzで【RANK %@ %.1fm】を記録！お前は超える？ #ShakeFizz";
+"share" = "スコアをシェアする";
+"share_result_text" = "ShakeFizzで【%.1fm】を記録！\nお前は超える?";
 
 // リーグ名（缶別）
 "league_ultra_cola" = "ウルトラコーラリーグ";
@@ -220,3 +220,4 @@
 "beat_player_format" = "#%d にあと +%.1fm で追いつける！";
 "league_position_format" = "リーグ順位 #%d";
 
+"dash_symbol" = "—";

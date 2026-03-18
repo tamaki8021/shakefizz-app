@@ -171,7 +171,7 @@
 
 // Result Screen - Emotional Redesign (30 Levels)
 "share" = "SHARE YOUR SCORE";
-"share_result_text" = "I hit RANK %@ at %.1fm in ShakeFizz! Can you beat me? #ShakeFizz";
+"share_result_text" = "I hit %.1fm in ShakeFizz!\nCan you beat this?";
 
 // League Names (per drink)
 "league_ultra_cola" = "ULTRA COLA LEAGUE";
@@ -220,3 +220,4 @@
 "beat_player_format" = "Just +%.1fm to pass #%d!";
 "league_position_format" = "LEAGUE RANK #%d";
 
+"dash_symbol" = "—";
