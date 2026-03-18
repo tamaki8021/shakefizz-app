@@ -56,8 +56,8 @@ struct OutOfFizzModalView: View {
         Button(action: onWatchAd) {
           ZStack {
             RoundedRectangle(cornerRadius: 30)
-              .fill(Color.neonMagenta)
-              .shadow(color: .neonMagenta.opacity(0.6), radius: 20, x: 0, y: 0)
+              .fill(Color.neonCyan)
+              .shadow(color: .neonCyan.opacity(0.6), radius: 20, x: 0, y: 0)
 
             HStack(spacing: 12) {
               Image(systemName: "play.circle.fill")
@@ -88,7 +88,7 @@ struct OutOfFizzModalView: View {
         HStack {
           Image(systemName: "hourglass")
             .font(.system(size: 16))
-            .foregroundColor(.neonMagenta)
+            .foregroundColor(.neonCyan)
 
           Text(countdownFormatted)
             .font(.system(size: 20, weight: .medium, design: .monospaced))
@@ -103,8 +103,8 @@ struct OutOfFizzModalView: View {
             .padding(.vertical, 4)
             .background(
               Capsule()
-                .fill(Color.neonMagenta.opacity(0.3))
-                .overlay(Capsule().stroke(Color.neonMagenta.opacity(0.5), lineWidth: 1))
+                .fill(Color.neonCyan.opacity(0.3))
+                .overlay(Capsule().stroke(Color.neonCyan.opacity(0.5), lineWidth: 1))
             )
         }
         .padding(.horizontal, 20)
@@ -137,7 +137,7 @@ struct OutOfFizzModalView: View {
           .strokeBorder(
             LinearGradient(
               colors: [
-                Color.neonMagenta.opacity(0.5), .clear, .clear, Color.neonMagenta.opacity(0.2),
+                Color.neonCyan.opacity(0.5), .clear, .clear, Color.neonCyan.opacity(0.2),
               ],
               startPoint: .topLeading,
               endPoint: .bottomTrailing
@@ -159,8 +159,8 @@ struct OutOfFizzModalView: View {
       Text(LocalizedStringKey("fizz_exclamation"))
         .font(.system(size: 32, weight: .black))
         .italic()
-        .foregroundColor(.neonMagenta)
-        .shadow(color: .neonMagenta.opacity(0.5), radius: 8)
+        .foregroundColor(.neonCyan)
+        .shadow(color: .neonCyan.opacity(0.5), radius: 8)
     }
   }
 

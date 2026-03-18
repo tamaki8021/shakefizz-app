@@ -44,6 +44,8 @@
 
 // Settings
 "language" = "言語";
+"english" = "英語 (English)";
+"japanese" = "日本語 (Japanese)";
 "about" = "アプリについて";
 "version" = "バージョン";
 "build" = "ビルド";
@@ -104,6 +106,7 @@
 // Settings Screen - Updated
 "music" = "音楽";
 "music_desc" = "ハイエネルギービート";
+"general" = "一般";
 "immersion" = "没入感";
 "accessibility" = "アクセシビリティ";
 "reduce_motion" = "モーション削減";
@@ -113,6 +116,10 @@
 "mode_normal_long_desc" = "バランスの取れた炭酸物理の標準競技モード。";
 "mode_endless_long_desc" = "無限プレイ";
 "app_version" = "SHAKE FIZZ v%@";
+"about_title" = "SHAKEFIZZについて";
+"credits" = "クレジット";
+"developer_team" = "ShakeFizz 開発チーム";
+"rate_app" = "アプリを評価する";
 "support" = "サポート";
 "terms" = "利用規約";
 "privacy" = "プライバシー";

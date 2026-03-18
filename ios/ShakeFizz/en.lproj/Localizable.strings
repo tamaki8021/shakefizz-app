@@ -44,6 +44,8 @@
 
 // Settings
 "language" = "Language";
+"english" = "English";
+"japanese" = "Japanese";
 "about" = "About";
 "version" = "Version";
 "build" = "Build";
@@ -104,6 +106,7 @@
 // Settings Screen - Updated
 "music" = "Music";
 "music_desc" = "High energy beats";
+"general" = "GENERAL";
 "immersion" = "IMMERSION";
 "accessibility" = "ACCESSIBILITY";
 "reduce_motion" = "Reduce Motion";
@@ -113,6 +116,10 @@
 "mode_normal_long_desc" = "Standard competition mode with balanced fizz physics.";
 "mode_endless_long_desc" = "Infinite play";
 "app_version" = "SHAKE FIZZ v%@";
+"about_title" = "ABOUT SHAKEFIZZ";
+"credits" = "Credits";
+"developer_team" = "ShakeFizz Dev Team";
+"rate_app" = "Rate the App";
 "support" = "Support";
 "terms" = "Terms";
 "privacy" = "Privacy";
