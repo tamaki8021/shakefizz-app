@@ -57,6 +57,9 @@ class ShakeManager: ObservableObject {
       self.pitch = data.attitude.pitch
 
       if magnitude > 0.5 {
+        if !self.isShaking {
+          GameEventManager.shared.handleEvent(.shakeStart)
+        }
         self.isShaking = true
         // Add to pressure based on intensity
         let gain = magnitude * 0.1 * self.fizzModifier
@@ -66,6 +69,9 @@ class ShakeManager: ObservableObject {
         // Cap at 1.0 or slightly higher for extreme shaking
         self.liquidAgitation = min(self.liquidAgitation + (magnitude * 0.05), 1.5)
       } else {
+        if self.isShaking {
+          GameEventManager.shared.handleEvent(.shakeEnd)
+        }
         self.isShaking = false
         // Decay agitation to simulate liquid settling
         // exponential decay: reduces by ~5% every frame (60fps) -> fast settling but not instant

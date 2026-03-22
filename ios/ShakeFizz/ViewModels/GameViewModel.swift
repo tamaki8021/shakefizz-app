@@ -120,6 +120,9 @@ class GameViewModel: ObservableObject {
     isTimeUp = false
     gameTimeRemaining = 15.0
     shakeManager.startShaking()
+    
+    // プレイ中ずっと鳴り続けるBGM（ボコボコ音）を開始
+    GameEventManager.shared.handleEvent(.gameStart)
 
     gameTimer = Timer.publish(every: 0.1, on: .main, in: .common)
       .autoconnect()
@@ -138,6 +141,9 @@ class GameViewModel: ObservableObject {
     gameTimer = nil
     isTimeUp = true
     shakeManager.stopShaking()
+    
+    // プレイ中のBGM（ボコボコ音）を停止
+    GameEventManager.shared.handleEvent(.gameEnd)
   }
 
   func finishTyringToPop() {
@@ -231,6 +237,9 @@ class GameViewModel: ObservableObject {
     shakeManager.reset()
     currentSession = nil
     gameState = .selection
+    
+    // 念のためBGMを止める
+    GameEventManager.shared.handleEvent(.gameEnd)
   }
 
   func retryGame(fromZero: Bool = false) {
