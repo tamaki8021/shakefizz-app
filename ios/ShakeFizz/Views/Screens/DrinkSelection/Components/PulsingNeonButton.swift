@@ -21,7 +21,10 @@ struct PulsingNeonButton: View {
   }
 
   var body: some View {
-    Button(action: action) {
+    Button(action: {
+      GameEventManager.shared.handleEvent(.buttonTap)
+      action()
+    }) {
       HStack {
         if localized {
           Text(LocalizedStringKey(title))

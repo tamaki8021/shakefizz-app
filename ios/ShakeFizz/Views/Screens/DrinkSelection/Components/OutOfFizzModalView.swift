@@ -85,7 +85,7 @@ struct OutOfFizzModalView: View {
           .foregroundColor(.white.opacity(0.3))
           .padding(.top, 10)
 
-        HStack {
+        HStack(spacing: 8) {
           Image(systemName: "hourglass")
             .font(.system(size: 16))
             .foregroundColor(.neonCyan)
@@ -93,19 +93,6 @@ struct OutOfFizzModalView: View {
           Text(countdownFormatted)
             .font(.system(size: 20, weight: .medium, design: .monospaced))
             .foregroundColor(.white)
-
-          Spacer()
-
-          Text(LocalizedStringKey("slow"))
-            .font(.system(size: 10, weight: .black))
-            .foregroundColor(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-              Capsule()
-                .fill(Color.neonCyan.opacity(0.3))
-                .overlay(Capsule().stroke(Color.neonCyan.opacity(0.5), lineWidth: 1))
-            )
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

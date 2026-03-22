@@ -38,6 +38,9 @@ struct DrinkSelectionView: View {
       .sheet(isPresented: $showRankingSheet) {
         LeagueRankingView(currentRank: 42, currentScore: 85.5)  // Mock current rank/score for MVP
       }
+      .onAppear {
+        GameEventManager.shared.handleEvent(.menuBGM)
+      }
   }
 
   @ViewBuilder
@@ -210,6 +213,7 @@ struct DrinkSelectionView: View {
 
   private var startShakingButton: some View {
     Button(action: {
+      GameEventManager.shared.handleEvent(.buttonTap)
       if canStart {
         viewModel.proceedToWarning()
       } else if viewModel.fizzRemaining == 0 {

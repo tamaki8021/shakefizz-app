@@ -7,7 +7,10 @@ struct NeonButton: View {
   let action: () -> Void
 
   var body: some View {
-    Button(action: action) {
+    Button(action: {
+      GameEventManager.shared.handleEvent(.buttonTap)
+      action()
+    }) {
       HStack {
         Text(title)
           .font(.headline)

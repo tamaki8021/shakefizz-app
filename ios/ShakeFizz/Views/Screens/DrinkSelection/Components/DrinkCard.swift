@@ -201,7 +201,7 @@ struct DrinkCard: View {
         .padding(.top, 60)
 
         // LOCKEDバッジ
-        Text("LOCKED")
+        Text("COMING SOON")
           .font(.system(size: 10, weight: .black))
           .tracking(2)
           .foregroundColor(.neonYellow)

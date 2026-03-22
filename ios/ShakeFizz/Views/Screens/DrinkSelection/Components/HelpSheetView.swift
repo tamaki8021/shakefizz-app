@@ -192,6 +192,8 @@ struct HelpSheetView: View {
       
       // 3. Show highlight/checkmark after all movement stops
       DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+        // ターゲット決定の瞬間に軽い音と振動
+        GameEventManager.shared.handleEvent(.buttonTap)
         withAnimation(.spring()) {
           showCheckmark = true
         }
@@ -259,6 +261,13 @@ struct HelpSheetView: View {
       withAnimation(.easeInOut(duration: 0.2).repeatForever(autoreverses: true)) {
         lineOpacity = 0.8
       }
+      
+      // シェイク画面が表示されている間だけシェイカー音をループさせる
+      GameEventManager.shared.handleEvent(.helpShake)
+    }
+    .onDisappear {
+      // タブを切り替えたらストップする
+      GameEventManager.shared.handleEvent(.stopBGM)
     }
   }
 
@@ -382,6 +391,9 @@ struct HelpSheetView: View {
       withAnimation(.spring(response: 0.6, dampingFraction: 0.6).delay(1.9)) {
         showCrown = true
       }
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
+        if selectedStep == .compete { GameEventManager.shared.handleEvent(.scoreAppear) }
+      }
       
       // Rank list scroll-up after crown
       withAnimation(.easeInOut(duration: 2.0).delay(2.2)) {
@@ -392,6 +404,7 @@ struct HelpSheetView: View {
       DispatchQueue.main.asyncAfter(deadline: .now() + 4.5) {
         // Ensure we are still on the compete step before executing
         if selectedStep == .compete {
+          GameEventManager.shared.handleEvent(.rankUp)
           withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
             // Replace rank 10 with rank 3 and reorder
             if let meIndex = rankings.firstIndex(where: { $0.isMe }) {
@@ -530,7 +543,10 @@ struct HelpStepCard: View {
   let action: () -> Void
 
   var body: some View {
-    Button(action: action) {
+    Button(action: {
+      GameEventManager.shared.handleEvent(.buttonTap)
+      action()
+    }) {
       ZStack {
         RoundedRectangle(cornerRadius: 15)
           .fill(isSelected ? color.opacity(0.15) : Color.white.opacity(0.05))

@@ -364,7 +364,10 @@ struct ResultView: View {
                 }
 
                 // HOME（ゴーストボタン）
-                Button(action: { viewModel.resetGame() }) {
+                Button(action: {
+                  GameEventManager.shared.handleEvent(.buttonTap)
+                  viewModel.resetGame()
+                }) {
                   Text(LocalizedStringKey("home"))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white.opacity(0.5))
@@ -413,6 +416,8 @@ struct ResultView: View {
             withAnimation(.none) { flashOpacity = 0.85 }
             withAnimation(.easeOut(duration: 0.22)) { flashOpacity = 0.0 }
             showFizzColumn = true
+            GameEventManager.shared.handleEvent(.explosion)
+            GameEventManager.shared.handleEvent(.resultAmbient)
           }
 
           // 高スコア（15m以上）は爆発後の画面揺れも発動
@@ -435,6 +440,7 @@ struct ResultView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.72) {
           if session.score > 0 { animateScore(to: session.score) }
           withAnimation(.spring(response: 0.45, dampingFraction: 0.55)) { showTier1 = true }
+          GameEventManager.shared.handleEvent(.scoreAppear)
         }
 
         // ── 1.1s: ランクバッジ・スタッツ
@@ -444,6 +450,9 @@ struct ResultView: View {
             showTier3 = true
           }
           if let rank = session.rankNumber { animateRank(to: rank) }
+          if session.isPersonalBest && session.score > 0 {
+            GameEventManager.shared.handleEvent(.rankUp)
+          }
         }
 
         // ── 1.5s: アクションボタン

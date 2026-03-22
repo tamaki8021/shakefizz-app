@@ -164,8 +164,7 @@ struct PlayScreenView: View {
         .contentShape(Rectangle())
         .onTapGesture {
           guard !viewModel.isCountingDown && !viewModel.isTimeUp else { return }
-          let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-          impactFeedback.impactOccurred()
+          GameEventManager.shared.handleEvent(.buttonTap)
           viewModel.performTapAction()
         }
 
@@ -189,8 +188,7 @@ struct PlayScreenView: View {
                 withAnimation {
                   isPopping = true
                 }
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.success)
+                GameEventManager.shared.handleEvent(.buttonTap)
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                   viewModel.finishTyringToPop()
@@ -429,8 +427,7 @@ struct PopAnimationOverlay: View {
         canScale = 1.15  // 圧力の反動で少し大きくなる
       }
 
-      let impact = UIImpactFeedbackGenerator(style: .heavy)
-      impact.impactOccurred()
+      GameEventManager.shared.handleEvent(.canOpen)
 
       // 開栓時の圧力開放フラッシュ
       withAnimation(.easeOut(duration: 0.05)) { flashOpacity = 0.9 }

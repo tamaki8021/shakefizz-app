@@ -386,7 +386,14 @@ struct ImmersionSection: View {
           iconColor: .neonMagenta,
           title: "music",
           description: "music_desc",
-          isOn: $settingsManager.musicEnabled
+          isOn: $settingsManager.musicEnabled,
+          onChangeAction: { isEnabled in
+            if isEnabled {
+              GameEventManager.shared.handleEvent(.menuBGM)
+            } else {
+              GameEventManager.shared.handleEvent(.stopBGM)
+            }
+          }
         )
 
         Divider()
@@ -417,6 +424,7 @@ struct SettingToggleRow: View {
   let title: String
   let description: String?
   @Binding var isOn: Bool
+  var onChangeAction: ((Bool) -> Void)? = nil
 
   var body: some View {
     HStack(spacing: 12) {
@@ -442,6 +450,9 @@ struct SettingToggleRow: View {
       Toggle("", isOn: $isOn)
         .labelsHidden()
         .tint(.neonCyan)
+        .onChange(of: isOn) { newValue in
+          onChangeAction?(newValue)
+        }
     }
     .padding(.horizontal, 16)
     .padding(.vertical, 12)
