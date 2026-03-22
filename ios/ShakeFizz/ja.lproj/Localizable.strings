@@ -56,7 +56,7 @@
 "select_subtitle" = "武器を選べ。炭酸が強いほど高く飛ぶが、\nその分だけ不安定になる。";
 "shake_now" = "今すぐシェイク！";
 "locked" = "LOCKED";
-"locked_desc" = "ランクS到達でアンロック";
+"locked_desc" = "近日公開";
 "ok" = "OK";
 "ready" = "READY!";
 "rank_5" = "RANK 5";
@@ -164,8 +164,8 @@
 "best_meters_format %@" = "ベスト %@m";
 "best_meters_none" = "ベスト —";
 "unlock_req" = "解放条件";
-"unlock_beast_fuel" = "コーラリーグでトップ50に入る";
-"unlock_ginger_shock" = "ビーストフューエルでトップ10に入る";
+"unlock_beast_fuel" = "近日公開";
+"unlock_ginger_shock" = "近日公開";
 "km_h" = "km/h";
 "just_now" = "さっき";
 

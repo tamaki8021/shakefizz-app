@@ -56,7 +56,7 @@
 "select_subtitle" = "Choose your weapon. Higher carbonation means\nmore height, but less stability.";
 "shake_now" = "SHAKE NOW!";
 "locked" = "LOCKED";
-"locked_desc" = "Reach Rank S to unlock this drink";
+"locked_desc" = "Coming soon";
 "ok" = "OK";
 "ready" = "READY!";
 "rank_5" = "RANK 5";
@@ -164,8 +164,8 @@
 "best_meters_format %@" = "BEST %@m";
 "best_meters_none" = "BEST —";
 "unlock_req" = "UNLOCK REQ.";
-"unlock_beast_fuel" = "Reach Top 50 in Cola League";
-"unlock_ginger_shock" = "Reach Top 10 in Beast Fuel";
+"unlock_beast_fuel" = "Coming soon";
+"unlock_ginger_shock" = "Coming soon";
 "km_h" = "km/h";
 "just_now" = "Just now";
 
